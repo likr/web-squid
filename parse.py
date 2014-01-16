@@ -16,13 +16,22 @@ class Row(object):
         self.y = y
 
 
+def extrapolation(values, xindex, yindex, l=1):
+    vs = []
+    for i in range(-l, l + 1):
+        for j in range(-(l - abs(i)), l - abs(i) + 1):
+            if values[xindex + i, yindex + j]:
+                vs.append(values[xindex + i, yindex + j])
+    return numpy.average(vs) if vs else 0
+
+
 def load_var(x, y, data, points, depth):
     values = data[:, :, depth]
     for p in points:
         hx_index = bisect_left(x, p.x)
-        lx_index  = hx_index - 1
+        lx_index = hx_index - 1
         hy_index = bisect_left(y, p.y)
-        ly_index  = hy_index - 1
+        ly_index = hy_index - 1
 
         hx = x[hx_index]
         lx = x[lx_index]
@@ -30,9 +39,18 @@ def load_var(x, y, data, points, depth):
         ly = y[ly_index]
 
         ur_value = values[hx_index, hy_index]
-        ul_value = values[lx_index , hy_index]
+        ul_value = values[lx_index, hy_index]
         lr_value = values[hx_index, ly_index]
-        ll_value = values[lx_index , ly_index]
+        ll_value = values[lx_index, ly_index]
+
+        if ur_value == 0:
+            ur_value = extrapolation(values, hx_index, hy_index)
+        if ul_value == 0:
+            ul_value = extrapolation(values, lx_index, hy_index)
+        if lr_value == 0:
+            lr_value = extrapolation(values, hx_index, ly_index)
+        if ll_value == 0:
+            ll_value = extrapolation(values, lx_index, ly_index)
 
         l_value = (lr_value - ll_value)/(hx - lx)*(p.x - lx) + ll_value
         u_value = (ur_value - ul_value)/(hx - lx)*(p.x - lx) + ul_value
