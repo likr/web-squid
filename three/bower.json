@@ -1,0 +1,15 @@
+{
+  "name": "3d squid",
+  "version": "0.0.1",
+  "authors": [
+    "y4ashida"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

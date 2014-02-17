@@ -34,3 +34,13 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Project file
+*.sublime*
+
+# data
+S
+T
+U
+V
+W
