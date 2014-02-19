@@ -1,16 +1,16 @@
 from __future__ import print_function
 from datetime import datetime
-from bisect import bisect_left, bisect_right
+from bisect import bisect_left
 import csv
 import itertools
 import numpy
-import scipy
-import scipy.interpolate
 
 
 class Row(object):
     def __init__(self, x, y, date):
         self.data = []
+        self.year = date.year
+        self.month = date.month
         self.day = date.day
         self.x = x
         self.y = y
@@ -61,8 +61,8 @@ def load_var(x, y, data, points, depth):
 
 def load_row(row):
     y, x = float(row[8]), float(row[9])
-    cpue = float(row[41])
-    date = datetime.strptime(row[5], '%Y/%m/%d %H:%M')
+    cpue = float(row[44])
+    date = datetime.strptime(row[5], '%m/%d/%Y %H:%M')
     o = Row(x, y, date)
     o.data.append(cpue)
     return o
@@ -89,23 +89,28 @@ def load_grid(filename):
 
 def main():
     variables = ['S', 'T', 'U', 'V', 'W']
-    depths = range(0, 54, 10)
+    depths = range(54)
     labels = ['cpue']
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     x, y, _ = load_grid('S/S3D_intpo.ctl')
-    for day, points in itertools.groupby(data, lambda o: o.day):
+    data.sort(key=lambda d: d.day)
+    for date, points in itertools.groupby(data,
+                                          lambda o: (o.year, o.month, o.day)):
+        year, month, day = date
         points = list(points)
         for v in variables:
-            fname = '{0}/{0}3D_intpo.200601{1:02}'.format(v, day)
-            values = numpy.fromfile(fname, '>f4')
+            base = '/Volumes/ボリューム/JAMSTEC/'
+            fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}.gpv'\
+                .format(v, year, month, day)
+            values = numpy.fromfile(base + fname, '>f4')
             values.shape = (673, 442, 54)
             for depth in depths:
-                label = '200601{0}-{1}-{2}'.format(day, v, depth)
+                label = '{0:04}{1:02}{2:02}-{3}-{4}'\
+                    .format(year, month, day, v, depth)
                 print(label)
                 load_var(x, y, values, points, depth)
     labels.extend('{0}{1}'.format(v, d) for v in variables for d in depths)
-    print([row.data for row in data])
     writer = csv.writer(open('cpue-var.csv', 'w'))
     writer.writerow(labels)
     writer.writerows([row.data for row in data])
