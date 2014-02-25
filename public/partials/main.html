@@ -1,0 +1,35 @@
+<div class="row">
+  <h1>HSI modeling support</h2>
+  <div class="col-xs-6">
+    <h2>map region</h2>
+  </div>
+  <div class="col-xs-6">
+    <div class="row">
+      <h2>date selector</h2>
+      <form>
+        <input type="date"/>
+      </form>
+    </div>
+    <div class="row">
+      <h2>graph region</h2>
+      <div class="col-xs-4">
+        <h3>variables</h3>
+        <form>
+          <label class="radio"><input type="radio" ng-model="selectedVariable" value="S"/>S</label>
+          <label class="radio"><input type="radio" ng-model="selectedVariable" value="T"/>T</label>
+          <label class="radio"><input type="radio" ng-model="selectedVariable" value="U"/>U</label>
+          <label class="radio"><input type="radio" ng-model="selectedVariable" value="V"/>V</label>
+          <label class="radio"><input type="radio" ng-model="selectedVariable" value="W"/>W</label>
+        </form>
+      </div>
+      <div class="col-xs-4" ng-controller="DepthRelationController">
+        <h3>correlation</h3>
+        <svg id="depth-relation"></svg>
+      </div>
+      <div class="col-xs-4" ng-controller="DistributionController">
+        <h3>distribution</h3>
+        <svg id="distribution"></svg>
+      </div>
+    </div>
+  </div>
+</div>
