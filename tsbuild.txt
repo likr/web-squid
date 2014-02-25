@@ -1,3 +1,4 @@
---target ES5 --out public/squid-hsi.js\
+--target ES5 --out public/squid-hsi.js
 ts/depth-relation-controller.ts
+ts/distribution-controller.ts
 ts/map-controller.ts

@@ -199,6 +199,5 @@ app.controller('MapController', ['$scope', function($scope) {
   }
 
   main();
-  console.log(scene);
   }]);
 }
