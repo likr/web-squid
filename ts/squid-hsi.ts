@@ -1,3 +1,6 @@
+/// <reference path="typings/d3/d3.d.ts"/>
+/// <reference path="typings/angularjs/angular.d.ts"/>
+
 function quincunx(u, v, w, q) {
   var n = u.length - 1;
   var i;
@@ -43,7 +46,7 @@ function smoothingSpline(S, sigma, lambda, x, y) {
   });
   var i;
 
-  mu = 2 * (1 - lambda) / (3 * lambda);
+  var mu = 2 * (1 - lambda) / (3 * lambda);
   for (i = 0; i < n; ++i) {
     h[i] = x(S[i + 1]) - x(S[i]);
     r[i] = 3 / h[i];
@@ -129,7 +132,8 @@ function correlation(x, y) {
 }
 
 
-angular.module('squid-hsi', ['ngRoute'])
+module squid {
+export var app = angular.module('squid-hsi', ['ngRoute'])
   .factory('d3get', ['$q', function($q) {
     return function(xhr) {
       var deferred = $q.defer();
@@ -165,75 +169,6 @@ angular.module('squid-hsi', ['ngRoute'])
     });
 
     $scope.cpueVar = cpueVar;
-  }])
-  .controller('DepthRelationController', ['$scope', function($scope) {
-    cpueVar = $scope.cpueVar
-    var yKey = 'cpue';
-    var maxDepth = 25;
-    var xScale = d3.scale.linear()
-      .domain([-1, 1])
-      .range([5, 195])
-      ;
-    var yScale = d3.scale.linear()
-      .domain([0, maxDepth])
-      .range([195, 5])
-      ;
-
-    var Rs = [];
-    for (var depth = 0; depth <= maxDepth; ++depth) {
-      var xKey = $scope.selectedVariable + depth;
-      cpueVar.sort(function(d1, d2) {
-        return d1[xKey] - d2[xKey];
-      });
-      var interpolator = splineInterpolator(
-          cpueVar,
-          function(d) {
-            return +d[xKey];
-          },
-          function(d) {
-            return +d[yKey];
-          },
-          0.9);
-      var y = cpueVar.map(function(d) {
-        return +d[yKey];
-      });
-      var yPrime = cpueVar.map(function(d) {
-        return interpolator(+d[xKey]);
-      });
-      Rs.push([depth, correlation(y, yPrime)]);
-    }
-
-    var rootSelection = d3.select('svg#depth-relation')
-      .attr({
-        width: 200,
-        height: 200
-      });
-    rootSelection.append('g')
-      .classed('points', true)
-      .selectAll('circle.point')
-      .data(Rs)
-      .enter()
-      .append('circle')
-      .classed('point', true)
-      .attr({
-        fill: 'black',
-        r: 2,
-        cx: function(d) {return xScale(d[1]);},
-        cy: function(d) {return yScale(d[0]);}
-      });
-
-    var line = d3.svg.line()
-      .x(function(d) {return xScale(d[1]);})
-      .y(function(d) {return yScale(d[0]);})
-      ;
-
-    rootSelection.append('path')
-      .attr({
-        d: line(Rs),
-        fill: 'none',
-        stroke: 'black'
-      })
-      ;
   }])
   .controller('DistributionController', ['$scope', function($scope) {
     var cpueVar = $scope.cpueVar;
@@ -336,3 +271,4 @@ angular.module('squid-hsi', ['ngRoute'])
     $rootScope.selectedDepth = '0';
   }])
   ;
+}

@@ -1,0 +1,2 @@
+--target ES5 --out public/squid-hsi.js\
+ts/depth-relation-controller.ts
