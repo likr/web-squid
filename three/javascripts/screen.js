@@ -1,4 +1,6 @@
 (function(){
+debugMode = true;
+
 // initialize renderer
 var stage = $('div#stage');
 var renderer = new THREE.WebGLRenderer(),
@@ -9,9 +11,9 @@ renderer.setClearColor(0xffffff, 1.0);
 stage.append(renderer.domElement);
 
 // initialize camera
-var zoom = 100,
-    camerax = 227.9,
-    cameray = 158;
+var zoom = 80,
+    camerax = 228,
+    cameray = 162;
 var camera = new THREE.OrthographicCamera(rendererWidth/-zoom, rendererWidth/zoom, rendererHeight/zoom, rendererHeight/-zoom, 1, 1000);
 camera.position.set(camerax, cameray, 1);
 camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
@@ -20,180 +22,158 @@ camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
 var scene = new THREE.Scene();
 
 // mercator projection
-var r = 128 / Math.PI;
-var latitudeToPlane = function (lat) {
-  var latRad = Math.PI / 180 * lat;
-  return r / 2 * Math.log((1.0+Math.sin(latRad))/(1.0-Math.sin(latRad))) + 128;
-};
-var longitudeToPlane = function(lon){
-  var lonRad = Math.PI / 180 * lon;
-  return r * (lonRad + Math.PI);
-};
+var mercatrProjection = (function () {
+  var _r = 128 / Math.PI;
+  var _lonToX = function(lon) {
+    var lonRad = Math.PI / 180 * lon;
+    return _r * (lonRad + Math.PI);
+  };
+  var _latToY = function (lat) {
+    var latRad = Math.PI / 180 * lat;
+    return _r / 2 * Math.log((1.0 + Math.sin(latRad))/(1.0 - Math.sin(latRad))) + 128;
+  };
 
-var drawCoastLine = function(gml) {
+  return {
+    lonToX: _lonToX,
+    latToY: _latToY,
+    lonArrToX: function (lonArr) {
+      var arr = [];
+      for (var i = lonArr.length; i--;) {
+        arr[i] = _lonToX(lonArr[i]);
+      }
+      return arr;
+    },
+    latArrToY: function (latArr) {
+      var arr = [];
+      for (var i = latArr.length; i--;) {
+        arr[i] = _latToY(latArr[i]);
+      }
+      return arr;
+    }
+  }
+})();
+
+var drawCoastLine = function () {
+  // load gml
+  var gml;
+  $.ajax({
+    url: "data/coastl_jpn.gml",
+    dataType: "xml",
+    async: false,
+    error: function () { alert('Error loading XML document'); },
+    success: function (data) { gml = data; }
+  });
+
+  // draw coast line
   var material = new THREE.LineBasicMaterial({ color: 0x000000 });
   $(gml).find('coastl').each(function() {
     var posList = $(this).find('posList')[0].innerHTML.split(' ');
     var geometry = new THREE.Geometry();
-    for (var i = 0; i < posList.length - 1; i += 2) {
-      var vertice = new THREE.Vector3(longitudeToPlane(posList[i + 1]), latitudeToPlane(posList[i]), 0);
+    for (var i = 0, len = posList.length; i < len - 1; i += 2) {
+      var vertice = new THREE.Vector3(mercatrProjection.lonToX(posList[i + 1]), mercatrProjection.latToY(posList[i]), 0);
       geometry.vertices.push(vertice);
     }
     var line = new THREE.Line(geometry, material);
     scene.add(line);
   });
 };
-// load gml
-$.ajax({
-  url: "data/coastl_jpn.gml",
-  dataType: "xml",
-  error: function() { alert('Error loading XML document'); },
-  success: drawCoastLine
-});
 
-// 明石市テスト
-var geometry = new THREE.CircleGeometry(0.1, 10);
-var mesh = new THREE.Mesh( geometry );
-mesh.position = new THREE.Vector3(longitudeToPlane(135), latitudeToPlane(34.65), 0);
-scene.add(mesh);
+var drawGrid = function (xList, yList) {
+  var material = new THREE.LineBasicMaterial({ color: 0xaaaaaa }),
+      geometry, x, y, vertice, line,
+      xmin = xList[0], xmax = xList[xList.length-1],
+      ymin = yList[0], ymax = yList[yList.length-1];
 
-// 三角形を2つ組み合わせて正方形を作る
-var drawSquare = function(vertexCoordinatesList, color16List) {
-  var squGeo = new THREE.Geometry();
-  for (var i = 0; i < 2; i++) {
-    for (var j = 0; j < 3; j++) {
-      if(j==1&&i==1) {
-        var k = 3;
-      } else {
-        var k = j;
-      }
-      var x = longitudeToPlane(vertexCoordinatesList[k][0]);
-      var y = latitudeToPlane(vertexCoordinatesList[k][1]);
-      squGeo.vertices.push(new THREE.Vector3(x, y, -1));
+  for (var i = xList.length; i--;) {
+    geometry = new THREE.Geometry();
+    x = xList[i];
+    vertice = new THREE.Vector3(x, ymin, -0.5);
+    geometry.vertices.push(vertice);
+    vertice = new THREE.Vector3(x, ymax, -0.5);
+    geometry.vertices.push(vertice);
+    line = new THREE.Line(geometry, material);
+    scene.add(line);
+  }
+
+  for (var i = yList.length; i--;) {
+    geometry = new THREE.Geometry();
+    y = yList[i];
+    vertice = new THREE.Vector3(xmin, y, -0.5);
+    geometry.vertices.push(vertice);
+    vertice = new THREE.Vector3(xmax, y, -0.5);
+    geometry.vertices.push(vertice);
+    line = new THREE.Line(geometry, material);
+    scene.add(line);
+  }
+};
+
+var paint = function (values, xList, yList) {
+  var geo = new THREE.Geometry();
+
+  var cnt = 0;
+  var _createTriagle = function (vList, cList) {
+    for (var i = 0; i < 3; i++) {
+      geo.vertices.push(new THREE.Vector3(vList[i][0], vList[i][1], -1));
+    }
+    var vNum = 3 * cnt;
+    geo.faces.push(new THREE.Face3(vNum, vNum + 1, vNum + 2));
+    for (var i = 0; i < 3; i++) {
+      geo.faces[cnt].vertexColors[i] = new THREE.Color(cList[i]);
+    }
+    cnt++;
+  };
+
+  var _createSquare = function (vList, cList) {
+    _createTriagle([vList[0], vList[1], vList[2]], [cList[0], cList[1], cList[2]]);
+    _createTriagle([vList[0], vList[3], vList[2]], [cList[0], cList[3], cList[2]]);
+  };
+
+  // 値の最大値、最小値を求める
+  var max = Math.max.apply(Math, values[0]),
+      min = Math.min.apply(Math, values[0]);
+  for (var i = values.length - 1; i >= 0; i--) {
+    var val = values[i],
+        maxPerLat = Math.max.apply(val),
+        minPerLat = Math.min.apply(val);
+    if (maxPerLat > max) max = maxPerLat;
+    if (min > minPerLat || minPerLat < 1) min = minPerLat;
+  }
+
+  // initialize rainbow
+  var rainbow = new Rainbow();
+  rainbow.setNumberRange(34, max);
+
+  var _numTo16Color = function (num) {
+    if (num <= 30) {
+      return 0x000000;
+    }
+    return + ("0x"+rainbow.colourAt(num));
+  }
+
+  for (var xi = 0, xLen = xList.length - 1; xi < xLen; xi++) {
+    for (var yi = 0, yLen = yList.length - 1; yi < yLen; yi++) {
+      var vList = [
+        [xList[xi], yList[yi]],
+        [xList[xi + 1], yList[yi]],
+        [xList[xi + 1], yList[yi + 1]],
+        [xList[xi], yList[yi + 1]]
+      ];
+      var cList = [
+        _numTo16Color(values[yi][xi]),
+        _numTo16Color(values[yi][xi + 1]),
+        _numTo16Color(values[yi + 1][xi + 1]),
+        _numTo16Color(values[yi + 1][xi])
+      ];
+      _createSquare(vList, cList);
     }
   }
-  squGeo.faces.push(new THREE.Face3(0, 1, 2));
-  squGeo.faces.push(new THREE.Face3(3, 4, 5));
 
-  for(var i = 0; i < 2; i++) {
-    for (var j = 0; j < 3; j++) {
-      if(j==1&&i==1) {
-        var k = 3;
-      } else {
-        var k = j;
-      }
-      squGeo.faces[i].vertexColors[j] = new THREE.Color(color16List[k]);
-    }
-  }
-  var squMaterial = new THREE.MeshBasicMaterial({
+  var material = new THREE.MeshBasicMaterial({
       vertexColors:THREE.VertexColors,
       side:THREE.DoubleSide
   });
-  var squMesh = new THREE.Mesh(squGeo, squMaterial);
-  scene.add(squMesh);
-};
-
-// グリッド描写
-var drawGrid = function(xList, yList) {
-  var material = new THREE.LineBasicMaterial({ color: 0xaaaaaa }),
-      xmin = xList[0],
-      xmax = xList[xList.length-1],
-      ymin = yList[0],
-      ymax = yList[yList.length-1];
-
-  for (var i = xList.length - 1; i >= 0; i--) {
-    var geometry = new THREE.Geometry();
-    var x = xList[i];
-    var vertice = new THREE.Vector3(x, ymin, -0.5);
-    geometry.vertices.push(vertice);
-    var vertice = new THREE.Vector3(x, ymax, -0.5);
-    geometry.vertices.push(vertice);
-    var line = new THREE.Line(geometry, material);
-    scene.add(line);
-  }
-
-  for (var i = yList.length - 1; i >= 0; i--) {
-    var geometry = new THREE.Geometry();
-    var y = yList[i];
-    var vertice = new THREE.Vector3(xmin, y, -0.5);
-    geometry.vertices.push(vertice);
-    var vertice = new THREE.Vector3(xmax, y, -0.5);
-    geometry.vertices.push(vertice);
-    var line = new THREE.Line(geometry, material);
-    scene.add(line);
-  }
-};
-
-var xList = [], yList = [];
-$.ajax({
-  url: 'data/x.csv',
-  type: 'get',
-  dataType: 'html',
-  async: false,
-  success: function(lonListCsv) {
-    var lonList = CSV.parse(lonListCsv)[0];
-    for (var i = lonList.length - 1; i >= 0; i--) {
-      xList[i] = longitudeToPlane(lonList[i]);
-    }
-  }
-});
-$.ajax({
-  url: 'data/y.csv',
-  type: 'get',
-  dataType: 'html',
-  async: false,
-  success: function(latListCsv) {
-    var latList = CSV.parse(latListCsv)[0];
-    for (var i = latList.length - 1; i >= 0; i--) {
-      yList[i] = latitudeToPlane(latList[i]);
-    }
-  }
-});
-drawGrid(xList, yList);
-
-
-var rows;
-$.ajax({
-  url: 'data/kiri.csv',
-  type: 'get',
-  dataType: 'html',
-  async: false,
-  success: function(data) {
-    rows = CSV.parse(data);
-  }
-});
-
-function toColor(num) {
-  return + ("0x"+rainbow.colourAt(num));
-}
-
-var rainbow = new Rainbow();
-var len = rows.length,
-    max = 0,
-    min = 99;
-for (var i = len - 1; i >= 0; i--) {
-  if (max < rows[i][2]) { max = rows[i][2]; }
-}
-for (var i = len - 1; i >= 0; i--) {
-  if (min > rows[i][2]) { min = rows[i][2]; }
-}
-min = 34; // 決め打ち
-rainbow.setNumberRange(min, max);
-for (var i = 0, len = len - 443; i < len; i += 1) {
-  if (i != 441 && i % 442 != 441) {
-    var ulv = rows[i],
-        urv = rows[i+442],
-        lrv = rows[i+443],
-        llv = rows[i+1],
-        vertexCoordinatesList = [
-          [ulv[0], ulv[1]],
-          [urv[0], urv[1]],
-          [lrv[0], lrv[1]],
-          [llv[0], llv[1]]
-        ],
-        colors = [toColor(ulv[2]), toColor(urv[2]), toColor(lrv[2]), toColor(llv[2])];
-    drawSquare(vertexCoordinatesList, colors);
-  }
+  var mesh = new THREE.Mesh(geo, material);
+  scene.add(mesh);
 }
 
 // render
@@ -202,5 +182,19 @@ var render = function() {
   renderer.render(scene, camera);
 };
 
-render();
+function main () {
+  loadData('data/s.nc.dods', function(data) {
+    var _data = data[0];
+    var values = _data[0][0][0];
+    var xList = mercatrProjection.lonArrToX(_data[4]);
+    var yList = mercatrProjection.latArrToY(_data[3]);
+    if (debugMode) drawGrid(xList, yList);
+    paint(values, xList, yList);
+  });
+  drawCoastLine();
+  render();
+}
+
+main();
+
 })();
