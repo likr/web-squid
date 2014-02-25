@@ -138,14 +138,11 @@ app.controller('MapController', ['$scope', function($scope) {
     };
 
     // num to color
-    var max = 0, min;
-    for (var i = values.length - 1; i >= 0; i--) {
-      var val =  $.grep(values[i], function(e){return e;});
-      var maxPerLat = d3.max(val);
-      var minPerLat = d3.min(val);
-      if (maxPerLat > max) max = maxPerLat;
-      if (min > minPerLat || minPerLat < 1 || min == undefined) min = minPerLat;
-    }
+    var extents = values.map(row => {
+      return d3.extent(row.filter(v => v != 0));
+    });
+    var min = d3.min(extents, d => d[0]);
+    var max = d3.max(extents, d => d[1]);
     var scale = d3.scale.linear()
                   .domain([min, max])
                   .range([240, 360]);
