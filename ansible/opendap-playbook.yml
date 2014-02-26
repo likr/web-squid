@@ -1,0 +1,139 @@
+- hosts: all
+  vars:
+    proxy_env:
+      http_proxy: http://proxy.kuins.net:8080
+      https_proxy: http://proxy.kuins.net:8080
+  sudo: yes
+  tasks:
+    #- name: fetch rpmforge rpm
+    #  get_url: url=http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm dest=/tmp/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+
+    #- name: install rpmforge
+    #  yum: name=/tmp/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm state=present
+
+    #- name: install gdal
+    #  yum: name=gdal state=present
+    - name: fetch epel rpm
+      get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-5-4.noarch.rpm
+      environment: proxy_env
+
+    - name: install epel
+      yum: name=/tmp/epel-release-5-4.noarch.rpm state=present
+
+    - name: fetch libdap rpm
+      get_url: url=http://www.opendap.org/pub/binary/libdap/centos6.4/3.12.1_x86_64/libdap-3.12.1-1.x86_64.rpm dest=/tmp/libdap-3.12.1-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install libdap
+      yum: name=/tmp/libdap-3.12.1-1.x86_64.rpm state=present
+
+    - name: fetch bes rpm
+      get_url: url=http://www.opendap.org/pub/binary/bes/centos6.4/3.12.0_x86_64/bes-3.12.0-1.el6.x86_64.rpm dest=/tmp/bes-3.12.0-1.el6.x86_64.rpm
+      environment: proxy_env
+
+    - name: install bes
+      yum: name=/tmp/bes-3.12.0-1.el6.x86_64.rpm state=present
+
+    - name: fetch dap-server rpm
+      get_url: url=http://www.opendap.org/pub/binary/dap-server/centos6.4/4.1.3_x86_64/dap-server-4.1.3-1.x86_64.rpm dest=/tmp/dap-server-4.1.3-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install dap-server
+      yum: name=/tmp/dap-server-4.1.3-1.x86_64.rpm state=present
+
+    #- name: fetch gdal_handler rpm
+    #  get_url: url=http://www.opendap.org/pub/binary/gdal_handler/centos6.4/0.9.3_x86_64/gdal_handler-0.9.3-1.x86_64.rpm dest=/tmp/gdal_handler-0.9.3-1.x86_64.rpm
+
+    #- name: install gdal_handler rpm
+    #  yum: name=/tmp/gdal_handler-0.9.3-1.x86_64.rpm state=present
+
+    - name: fetch freeform_handler rpm
+      get_url: url=http://www.opendap.org/pub/binary/freeform_handler/centos6.4/3.8.7_x86_64/freeform_handler-3.8.7-1.x86_64.rpm dest=/tmp/freeform_handler-3.8.7-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install freeform_handler
+      yum: name=/tmp/freeform_handler-3.8.7-1.x86_64.rpm state=present
+
+    - name: fetch hdf4_handler rpm
+      get_url: url=http://www.opendap.org/pub/binary/hdf4_handler/centos6.4/3.11.2_x86_64/hdf4_handler-3.11.2-1.x86_64.rpm dest=/tmp/hdf4_handler-3.11.2-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: insall hdf4_handler
+      yum: name=/tmp/hdf4_handler-3.11.2-1.x86_64.rpm state=present
+
+    - name: fetch hdf5_handler rpm
+      get_url: url=http://www.opendap.org/pub/binary/hdf5_handler/centos6.4/2.2.1_x86_64/hdf5_handler-2.2.1-1.x86_64.rpm dest=/tmp/hdf5_handler-2.2.1-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install hdf5_handler
+      yum: name=/tmp/hdf5_handler-2.2.1-1.x86_64.rpm state=present
+
+    - name: fetch netcdf_handler rpm
+      get_url: url=http://www.opendap.org/pub/binary/netcdf_handler/centos6.4/3.10.3_x86_64/netcdf_handler-3.10.3-1.x86_64.rpm dest=/tmp/netcdf_handler-3.10.3-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install netcdf_handler
+      yum: name=/tmp/netcdf_handler-3.10.3-1.x86_64.rpm state=present
+
+    - name: fetch csv_handler rpm
+      get_url: url=http://www.opendap.org/pub/binary/csv_handler/centos6.4/1.0.3_x86_64/csv_handler-1.0.3-1.x86_64.rpm dest=/tmp/csv_handler-1.0.3-1.x86_64.rpm
+      environment: proxy_env
+
+    - name: install csv_handler
+      yum: name=/tmp/csv_handler-1.0.3-1.x86_64.rpm state=present
+
+    - name: install tomcat6
+      yum: name=tomcat6
+
+    - name: install tomcat6-webapps
+      yum: name=tomcat6-webapps
+
+    - name: install tomcat6-admin-webapps
+      yum: name=tomcat6-admin-webapps
+
+    - name: mkdir tomcat-content
+      command: mkdir /var/lib/tomcat6/content creates=/var/lib/tomcat6/content
+
+    - name: fetch OLFS
+      get_url: url=http://www.opendap.org/pub/olfs/olfs-1.10.0-webapp.tgz dest=/tmp/olfs-1.10.0-webapp.tgz
+      environment: proxy_env
+
+    - name: unarchive OLFS
+      command: tar -xzf olfs-1.10.0-webapp.tgz chdir=/tmp creates=/tmp/olfs-1.10.0-webapp
+
+    - name: deploy OLFS
+      command: unzip /tmp/olfs-1.10.0-webapp/opendap.war -d /var/lib/tomcat6/webapps/opendap creates=/var/lib/tomcat6/webapps/opendap
+
+    - name: initialize OLFS
+      command: cp -R /var/lib/tomcat6/webapps/opendap/initialContent /var/lib/tomcat6/content/opendap creates=/var/lib/tomcat6/content/opendap
+
+    - name: mkdir OLFS logs
+      command: mkdir /var/lib/tomcat6/content/opendap/logs creates=/var/lib/tomcat6/content/opendap/logs
+
+    #- name: fetch cors-filter
+    #  get_url: url=http://search.maven.org/remotecontent?filepath=com/thetransactioncompany/cors-filter/1.8/cors-filter-1.8.jar dest=/tmp/cors-filter-1.8.jar
+    #  environment: proxy_env
+
+    #- name: install cors-filter
+    #  command: cp /tmp/cors-filter-1.8.jar /var/lib/tomcat6/webapps/opendap/WEB-INF/lib creates=/var/lib/tomcat6/webapps/opendap/WEB-INF/lib/cors-filter-1.8.jar
+
+    #- name: fetch java-property-utils
+    #  get_url: url=http://search.maven.org/remotecontent?filepath=com/thetransactioncompany/java-property-utils/1.9/java-property-utils-1.9.jar dest=/tmp/java-property-utils-1.9.jar
+    #  environment: proxy_env
+
+    #- name: install java-property-utils
+    #  command: cp /tmp/java-property-utils-1.9.jar /var/lib/tomcat6/webapps/opendap/WEB-INF/lib creates=/var/lib/tomcat6/webapps/opendap/WEB-INF/lib/java-property-utils-1.9.jar
+    - name: restart tomcat
+      service: name=tomcat6 enabled=yes state=restarted
+
+    - name: install httpd
+      yum: name=httpd state=present
+
+    - name: add proxy_ajp settings
+      copy: src=proxy_ajp.conf dest=/etc/httpd/conf.d/proxy_ajp.conf
+
+    - name: add cors settings
+      copy: src=cors.conf dest=/etc/httpd/conf.d/cors.conf
+
+    - name: restart httpd
+      service: name=httpd enabled=yes state=restarted
