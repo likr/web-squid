@@ -32,17 +32,5 @@ export var app = angular.module('squid-hsi', ['ngRoute'])
       })
       ;
   }])
-  .controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar) {
-    var xKey = 'S0';
-    cpueVar.sort(function(d1, d2) {
-      return d1[xKey] - d2[xKey];
-    });
-
-    $scope.cpueVar = cpueVar;
-  }])
-  .run(['$rootScope', function($rootScope) {
-    $rootScope.selectedVariable = 'S';
-    $rootScope.selectedDepth = '0';
-  }])
   ;
 }

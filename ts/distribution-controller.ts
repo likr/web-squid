@@ -4,82 +4,121 @@
 
 
 module squid {
-app.controller('DistributionController', ['$scope', function($scope) {
-  var cpueVar = $scope.cpueVar;
-  var yKey = 'cpue';
-  var xKey = $scope.selectedVariable + $scope.selectedDepth;
-  cpueVar.sort(function(d1, d2) {
-    return d1[xKey] - d2[xKey];
-  });
-  var extent  = d3.extent(cpueVar, (d => +d[xKey]));
-  var xs = [];
-  for (var x = extent[0]; x < extent[1]; x += (extent[1] - extent[0]) / 100) {
-    xs.push(x);
-  }
+var nInterval = 100;
+var svgWidth = 200;
+var svgHeight = 200;
+var svgMargin = 5;
+
+function drawGraph(selection, data, key, lambda) {
+  var xs = (() => {
+    var xs = new Array(nInterval);
+    var extent  = d3.extent(data, (d => +d[key]));
+    var i;
+    var d = (extent[1] - extent[0]) / nInterval;
+    for (i = 0; i < nInterval; ++i) {
+      xs[i] = d * i + extent[0];
+    }
+    return xs;
+  })();
 
   var interpolator = spline.splineInterpolator(
-    cpueVar,
-    function(d) {
-      return +d[xKey];
-    },
-    function(d) {
-      return +d[yKey];
-    },
-    0.5);
+      data,
+      d => +d[key],
+      d => +d['cpue'],
+      lambda);
 
   var xScale = d3.scale.linear()
-    .domain(d3.extent(cpueVar, function(d) {
-      return +d[xKey];
-    }))
-    .range([5, 195])
+    .domain(d3.extent(data, d => +d[key]))
+    .range([svgMargin, svgWidth - svgMargin])
     ;
   var yScale = d3.scale.linear()
-    .domain([0, d3.max(cpueVar, function(d) {
-      return +d[yKey];
-    })])
-    .range([195, 5])
+    .domain([0, d3.max(data, d => +d['cpue'])])
+    .range([svgWidth - svgMargin, svgMargin])
+    ;
+  var line = d3.svg.line()
+    .x(d => xScale(d))
+    .y(d => yScale(interpolator(d)))
+    ;
+  var transition = selection.transition();
+  transition
+    .selectAll('circle.data')
+    .attr({
+      cx: d => xScale(+d[key]),
+      cy: d => yScale(+d['cpue'])
+    })
+    ;
+  transition
+    .select('path.spline')
+    .attr({
+      d: line(xs)
+    })
+    ;
+}
+
+
+app.controller('DistributionController', ['$scope', function($scope) {
+  var cpueVar = $scope.cpueVar;
+  var initialY = svgHeight / 2;
+  var xs = (() => {
+    var xs = new Array(nInterval);
+    var i;
+    var d = (svgWidth - svgMargin * 2) / nInterval;
+    for (i = 0; i < nInterval; ++i) {
+      xs[i] = d * i;
+    }
+    return xs;
+  })();
+  var yScale = d3.scale.linear()
+    .domain([0, d3.max(cpueVar, d => +d['cpue'])])
+    .range([svgWidth - svgMargin, svgMargin])
     ;
   var rootSelection = d3.select('svg#distribution')
     .attr({
-      width: 200,
-      height: 200
+      width: svgWidth,
+      height: svgHeight
     });
   rootSelection
     .selectAll('circle.data')
-    .data(xs)
+    .data(cpueVar)
     .enter()
     .append('circle')
     .classed('data', true)
     .attr({
-      fill: 'red',
-      r: 1,
-      cx: function(x) {return xScale(x);},
-      cy: function(x) {return yScale(interpolator(x));}
-    })
-    ;
-  rootSelection
-    .selectAll('circle.guide')
-    .data(cpueVar)
-    .enter()
-    .append('circle')
-    .classed('guide', true)
-    .attr({
       fill: 'black',
       r: 1,
-      cx: function(d) {return xScale(d[xKey]);},
-      cy: function(d) {return yScale(d[yKey]);}
+      cx: 0,
+      cy: d => yScale(d.cpue)
     })
     ;
-  var line = d3.svg.line();
-  line.x(function(d) {return xScale(d);});
-  line.y(function(d) {return yScale(interpolator(d));});
+  var line = d3.svg.line()
+    .x(d => d)
+    .y(d => initialY)
+    ;
   rootSelection
     .append('path')
+    .classed('spline', true)
     .attr({
       d: line(xs),
       fill: 'none',
       stroke: 'red'
     })
     ;
+
+  $scope.$watch('selectedVariable', (newValue, oldValue) => {
+    var xKey = $scope.selectedVariable + $scope.selectedDepth;
+    drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+  });
+
+  $scope.$watch('selectedDepth', (newValue, oldValue) => {
+    var xKey = $scope.selectedVariable + $scope.selectedDepth;
+    drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+  });
+
+  $scope.$watch('lambda', (newValue, oldValue) => {
+    if (0 < $scope.lambda && $scope.lambda <= 1) {
+      var xKey = $scope.selectedVariable + $scope.selectedDepth;
+      drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+    }
+  });
 }]);
 }

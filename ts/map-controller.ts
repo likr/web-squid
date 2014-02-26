@@ -4,6 +4,101 @@
 /// <reference path="lib/jsdap.d.ts"/>
 
 module squid {
+var mercatrProjection = (function () {
+  var _r = 128 / Math.PI;
+  var _lonToX = function(lon) {
+    var lonRad = Math.PI / 180 * lon;
+    return _r * (lonRad + Math.PI);
+  };
+  var _latToY = function (lat) {
+    var latRad = Math.PI / 180 * lat;
+    return _r / 2 * Math.log((1.0 + Math.sin(latRad))/(1.0 - Math.sin(latRad))) + 128;
+  };
+
+  return {
+    lonToX: _lonToX,
+    latToY: _latToY,
+    lonArrToX: function (lonArr) {
+      var arr = [];
+      for (var i = lonArr.length; i--;) {
+        arr[i] = _lonToX(lonArr[i]);
+      }
+      return arr;
+    },
+    latArrToY: function (latArr) {
+      var arr = [];
+      for (var i = latArr.length; i--;) {
+        arr[i] = _latToY(latArr[i]);
+      }
+      return arr;
+    }
+  }
+})();
+
+
+function createMesh(values, xList, yList) {
+  var geo = new THREE.Geometry();
+
+  var cnt = 0;
+  var _createTriagle = function (vList, cList) {
+    for (var i = 0; i < 3; i++) {
+      geo.vertices.push(new THREE.Vector3(vList[i][0], vList[i][1], -1));
+    }
+    var vNum = 3 * cnt;
+    geo.faces.push(new THREE.Face3(vNum, vNum + 1, vNum + 2));
+    for (var i = 0; i < 3; i++) {
+      geo.faces[cnt].vertexColors[i] = new THREE.Color(cList[i]);
+    }
+    cnt++;
+  };
+
+  var _createSquare = function (vList, cList) {
+    _createTriagle([vList[0], vList[1], vList[2]], [cList[0], cList[1], cList[2]]);
+    _createTriagle([vList[0], vList[3], vList[2]], [cList[0], cList[3], cList[2]]);
+  };
+
+  // num to color
+  var extents = values.map(row => {
+    return d3.extent(row.filter(v => v != 0));
+  });
+  var min = d3.min(extents, d => d[0]);
+  var max = d3.max(extents, d => d[1]);
+  var scale = d3.scale.linear()
+                .domain([min, max])
+                .range([240, 360]);
+  var _numTo16Color = function (num) {
+    if (num == 0){
+      return d3.hsl("hsl(100,100%,100%)").toString();
+    }
+    return d3.hsl("hsl("+scale(num)+",50%,50%)").toString();
+  };
+
+  for (var xi = 0, xLen = xList.length - 1; xi < xLen; xi++) {
+    for (var yi = 0, yLen = yList.length - 1; yi < yLen; yi++) {
+      var vList = [
+        [xList[xi], yList[yi]],
+        [xList[xi + 1], yList[yi]],
+        [xList[xi + 1], yList[yi + 1]],
+        [xList[xi], yList[yi + 1]]
+      ];
+      var cList = [
+        _numTo16Color(values[yi][xi]),
+        _numTo16Color(values[yi][xi + 1]),
+        _numTo16Color(values[yi + 1][xi + 1]),
+        _numTo16Color(values[yi + 1][xi])
+      ];
+      _createSquare(vList, cList);
+    }
+  }
+
+  var material = new THREE.MeshBasicMaterial({
+      vertexColors:THREE.VertexColors,
+      side:THREE.DoubleSide
+  });
+  return new THREE.Mesh(geo, material);
+}
+
+
 app.controller('MapController', ['$scope', function($scope) {
   var debugMode = false;
   // initialize renderer
@@ -20,47 +115,15 @@ app.controller('MapController', ['$scope', function($scope) {
   stage.append(renderer.domElement);
 
   // initialize camera
-  var zoom = 80,
+  var zoom = 100,
       camerax = 230,
-      cameray = 162;
+      cameray = 160;
   var camera = new THREE.OrthographicCamera(rendererWidth/-zoom, rendererWidth/zoom, rendererHeight/zoom, rendererHeight/-zoom, 1, 1000);
   camera.position.set(camerax, cameray, 1);
   camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
 
   // initialize scene
   var scene = new THREE.Scene();
-
-  // mercator projection
-  var mercatrProjection = (function () {
-    var _r = 128 / Math.PI;
-    var _lonToX = function(lon) {
-      var lonRad = Math.PI / 180 * lon;
-      return _r * (lonRad + Math.PI);
-    };
-    var _latToY = function (lat) {
-      var latRad = Math.PI / 180 * lat;
-      return _r / 2 * Math.log((1.0 + Math.sin(latRad))/(1.0 - Math.sin(latRad))) + 128;
-    };
-
-    return {
-      lonToX: _lonToX,
-      latToY: _latToY,
-      lonArrToX: function (lonArr) {
-        var arr = [];
-        for (var i = lonArr.length; i--;) {
-          arr[i] = _lonToX(lonArr[i]);
-        }
-        return arr;
-      },
-      latArrToY: function (latArr) {
-        var arr = [];
-        for (var i = latArr.length; i--;) {
-          arr[i] = _latToY(latArr[i]);
-        }
-        return arr;
-      }
-    }
-  })();
 
   var drawCoastLine = function () {
     // load gml
@@ -116,66 +179,13 @@ app.controller('MapController', ['$scope', function($scope) {
     }
   };
 
+  var mesh
   var paint = function (values, xList, yList) {
-    var geo = new THREE.Geometry();
-
-    var cnt = 0;
-    var _createTriagle = function (vList, cList) {
-      for (var i = 0; i < 3; i++) {
-        geo.vertices.push(new THREE.Vector3(vList[i][0], vList[i][1], -1));
-      }
-      var vNum = 3 * cnt;
-      geo.faces.push(new THREE.Face3(vNum, vNum + 1, vNum + 2));
-      for (var i = 0; i < 3; i++) {
-        geo.faces[cnt].vertexColors[i] = new THREE.Color(cList[i]);
-      }
-      cnt++;
-    };
-
-    var _createSquare = function (vList, cList) {
-      _createTriagle([vList[0], vList[1], vList[2]], [cList[0], cList[1], cList[2]]);
-      _createTriagle([vList[0], vList[3], vList[2]], [cList[0], cList[3], cList[2]]);
-    };
-
-    // num to color
-    var extents = values.map(row => {
-      return d3.extent(row.filter(v => v != 0));
-    });
-    var min = d3.min(extents, d => d[0]);
-    var max = d3.max(extents, d => d[1]);
-    var scale = d3.scale.linear()
-                  .domain([min, max])
-                  .range([240, 360]);
-    var _numTo16Color = function (num) {
-      if (num < 30){
-        return d3.hsl("hsl(100,100%,100%)").toString();
-      }
-      return d3.hsl("hsl("+scale(num)+",50%,50%)").toString();
-    };
-
-    for (var xi = 0, xLen = xList.length - 1; xi < xLen; xi++) {
-      for (var yi = 0, yLen = yList.length - 1; yi < yLen; yi++) {
-        var vList = [
-          [xList[xi], yList[yi]],
-          [xList[xi + 1], yList[yi]],
-          [xList[xi + 1], yList[yi + 1]],
-          [xList[xi], yList[yi + 1]]
-        ];
-        var cList = [
-          _numTo16Color(values[yi][xi]),
-          _numTo16Color(values[yi][xi + 1]),
-          _numTo16Color(values[yi + 1][xi + 1]),
-          _numTo16Color(values[yi + 1][xi])
-        ];
-        _createSquare(vList, cList);
-      }
+    if (mesh !== undefined) {
+      scene.remove(mesh);
     }
-
-    var material = new THREE.MeshBasicMaterial({
-        vertexColors:THREE.VertexColors,
-        side:THREE.DoubleSide
-    });
-    var mesh = new THREE.Mesh(geo, material);
+    mesh = createMesh(values, xList, yList);
+    console.log(mesh);
     scene.add(mesh);
   }
 
@@ -185,19 +195,48 @@ app.controller('MapController', ['$scope', function($scope) {
     renderer.render(scene, camera);
   };
 
-  function main () {
-    loadData('data/s.nc.dods', function(data) {
+  var initialized = false;
+  function draw (v, d) {
+    var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/ocean.nc.dods?' + v.toLowerCase() + '[0][' + d + '][212:2:282][232:2:322]';
+    loadData(dataUrl, function(data) {
       var _data = data[0];
       var values = _data[0][0][0];
       var xList = mercatrProjection.lonArrToX(_data[4]);
       var yList = mercatrProjection.latArrToY(_data[3]);
-      if (debugMode) drawGrid(xList, yList);
+      if (!initialized && debugMode) {
+        drawGrid(xList, yList);
+      }
       paint(values, xList, yList);
     });
-    drawCoastLine();
-    render();
+    if (!initialized) {
+      drawCoastLine();
+    }
   }
+  render();
 
-  main();
-  }]);
+  $scope.showVariable = true;
+  $scope.showHSI = true;
+
+  $scope.$watch('selectedVariable', () => {
+    if ($scope.showVariable) {
+      draw($scope.selectedVariable, $scope.selectedDepth);
+    }
+  });
+
+  $scope.$watch('selectedDepth', () => {
+    if ($scope.showVariable) {
+      draw($scope.selectedVariable, $scope.selectedDepth);
+    }
+  });
+
+  $scope.$watch('showVariable', () => {
+    if ($scope.showVariable) {
+      draw($scope.selectedVariable, $scope.selectedDepth);
+    } else {
+      if (mesh) {
+        scene.remove(mesh);
+      }
+    }
+  });
+}]);
 }

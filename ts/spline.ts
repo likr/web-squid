@@ -92,29 +92,34 @@ export function smoothingSpline(x, y, sigma, lambda) {
 
 
 export function splineInterpolator(S, xAccessor, yAccessor, lambda) {
+  var xy = S.map(d => [+xAccessor(d), +yAccessor(d)]);
+  xy.sort((d1, d2) => d1[0] - d2[0]);
   var x0 = undefined;
-  S = S.filter(d => {
+  xy = xy.filter(d => {
     var x00 = x0;
-    x0 = xAccessor(d);
+    x0 = d[0];
     return x00 != x0;
   });
-  var sigma = S.map(function() {
+  var sigma = xy.map(function() {
     return 1;
   });
-  var xArray = S.map(xAccessor);
-  var yArray = S.map(yAccessor);
-  var params = smoothingSpline(xArray, yArray, sigma, lambda);
-  return function(x) {
-    var i = d3.bisectRight(xArray, x) - 1;
-    if (i >= xArray.length - 1) {
-      i = xArray.length - 2;
+  var x = xy.map(d => d[0]);
+  var y = xy.map(d => d[1]);
+  var params = smoothingSpline(x, y, sigma, lambda);
+  return function(xi : number) : number {
+    var i = d3.bisectRight(x, xi) - 1;
+    if (i < 0) {
+      i = 0;
+    }
+    if (i >= x.length - 1) {
+      i = x.length - 2;
     }
     var a = params[i][0],
         b = params[i][1],
         c = params[i][2],
         d = params[i][3];
-    x = x - xArray[i];
-    return a * x * x * x + b * x * x + c * x + d;
+    xi = xi - x[i];
+    return a * xi * xi * xi + b * xi * xi + c * xi + d;
   };
 }
 
