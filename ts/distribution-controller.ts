@@ -21,7 +21,7 @@ function drawGraph(selection, data, key, lambda) {
     return xs;
   })();
 
-  var interpolator = spline.splineInterpolator(
+  var interpolator = spline.interpolator(
       data,
       d => +d[key],
       d => +d['cpue'],
@@ -37,7 +37,7 @@ function drawGraph(selection, data, key, lambda) {
     ;
   var line = d3.svg.line()
     .x(d => xScale(d))
-    .y(d => yScale(interpolator(d)))
+    .y(d => yScale(interpolator.interpolate(d)))
     ;
   var transition = selection.transition();
   transition
@@ -104,21 +104,31 @@ app.controller('DistributionController', ['$scope', function($scope) {
     })
     ;
 
-  $scope.$watch('selectedVariable', (newValue, oldValue) => {
+  function draw() {
     var xKey = $scope.selectedVariable + $scope.selectedDepth;
     drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+  }
+
+  $scope.$watch('selectedVariable', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      draw();
+    }
   });
 
   $scope.$watch('selectedDepth', (newValue, oldValue) => {
-    var xKey = $scope.selectedVariable + $scope.selectedDepth;
-    drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+    if (newValue !== oldValue) {
+      draw();
+    }
   });
 
   $scope.$watch('lambda', (newValue, oldValue) => {
-    if (0 < $scope.lambda && $scope.lambda <= 1) {
-      var xKey = $scope.selectedVariable + $scope.selectedDepth;
-      drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+    if (newValue !== oldValue) {
+      if (0 < $scope.lambda && $scope.lambda <= 1) {
+        draw();
+      }
     }
   });
+
+  draw();
 }]);
 }

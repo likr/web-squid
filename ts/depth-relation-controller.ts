@@ -12,7 +12,7 @@ var xScale = d3.scale.linear()
   ;
 var yScale = d3.scale.linear()
   .domain([0, maxDepth])
-  .range([svgHeight - svgMargin, svgMargin])
+  .range([svgMargin, svgHeight - svgMargin])
   ;
 var line = d3.svg.line()
   .x(d => xScale(d[1]))
@@ -26,13 +26,13 @@ function drawGraph(selection, data, variable, lambda) {
     var depth;
     for (depth = 0; depth <= maxDepth; ++depth) {
       var key = variable + depth;
-      var interpolator = spline.splineInterpolator(
+      var interpolator = spline.interpolator(
           data,
           d => +d[key],
           d => +d['cpue'],
           lambda);
       var y = data.map(d => +d['cpue']);
-      var yPrime = data.map(d => interpolator(+d[key]));
+      var yPrime = data.map(d => interpolator.interpolate(+d[key]));
       Rs.push([depth, spline.correlation(y, yPrime)]);
     }
     return Rs;
@@ -50,6 +50,14 @@ function drawGraph(selection, data, variable, lambda) {
   transition
     .select('path.line')
     .attr('d', line(Rs))
+    ;
+}
+
+
+function changeActivePoint(selection, selectedDepth) {
+  selection
+    .selectAll('circle.point')
+    .style('fill', d => d[0] == selectedDepth ? 'red' : 'black')
     ;
 }
 
@@ -83,7 +91,13 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
       r: 2,
       cx: xScale(svgMargin),
       cy: d => yScale(d[0])
-    });
+    })
+    .on('click', d => {
+        $scope.$apply(() => {
+          $scope.$parent.selectedDepth = d[0];
+        });
+    })
+    ;
 
   rootSelection.append('path')
     .classed('line', true)
@@ -95,13 +109,24 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
     ;
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
-    drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
-  });
-
-  $scope.$watch('lambda', (newValue, oldValue) => {
-    if (0 < $scope.lambda && $scope.lambda <= 1) {
+    if (newValue !== oldValue) {
       drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
     }
   });
+
+  $scope.$watch('lambda', (newValue, oldValue) => {
+    if (newValue !== oldValue && 0 < $scope.lambda && $scope.lambda <= 1) {
+      drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
+    }
+  });
+
+  $scope.$watch('selectedDepth', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      changeActivePoint(rootSelection, $scope.selectedDepth);
+    }
+  });
+
+  drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
+  changeActivePoint(rootSelection, $scope.selectedDepth);
 }]);
 }
