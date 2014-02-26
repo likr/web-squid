@@ -41,7 +41,8 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
       variable: $scope.selectedVariable,
       depth: $scope.selectedDepth,
       lambda: $scope.lambda,
-      SIFunction: $scope.SIFunction
+      SIFunction: $scope.SIFunction,
+      active: true
     });
   };
 

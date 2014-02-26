@@ -205,11 +205,12 @@ app.controller('MapController', ['$scope', function($scope) {
         scene.add(mesh);
         break;
       case 'hsi':
+        var SIs = $scope.SIs.filter(SI => SI.active);
         mesh = createMesh(grid, xList, yList, d => {
           var xi = d[0];
           var yi = d[1];
           var hsi = 1;
-          $scope.SIs.forEach(SI => {
+          SIs.forEach(SI => {
             hsi *= SI.SIFunction(dataCache[SI.variable + SI.depth][0][0][0][0][yi][xi])
           });
           return hsi;
@@ -283,6 +284,18 @@ app.controller('MapController', ['$scope', function($scope) {
   });
 
   $scope.$watch('SIs.length', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if ($scope.view == 'hsi') {
+        draw();
+      }
+    }
+  });
+
+  $scope.activeSICount = () => {
+    return $scope.SIs.filter(SI => SI.active).length;
+  };
+
+  $scope.$watch('activeSICount()', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       if ($scope.view == 'hsi') {
         draw();

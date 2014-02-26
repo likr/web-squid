@@ -19,6 +19,24 @@ export var app = angular.module('squid-hsi', ['ngRoute'])
       return deferred.promise;
     };
   }])
+  .filter('variableName', [() => {
+    return (variable : string) : string => {
+      switch (variable) {
+        case 'S':
+          return 'Salinity';
+        case 'T':
+          return 'Temperature';
+        case 'U':
+          return 'Horizontal Velocity (Lat.)';
+        case 'V':
+          return 'Horizontal Velocity (Lon.)';
+        case 'W':
+          return 'Vertical Velocity';
+        default:
+          return '';
+      }
+    }
+  }])
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {
