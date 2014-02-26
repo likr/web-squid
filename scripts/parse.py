@@ -94,7 +94,8 @@ def main():
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     data = [o for o in data if
-            (2006, 1, 10) <= (o.year, o.month, o.day) <= (2006, 1, 19)]
+            True]
+            #(2006, 1, 10) <= (o.year, o.month, o.day) <= (2006, 1, 19)]
     x, y, _ = load_grid('S/S3D_intpo.ctl')
     data.sort(key=lambda d: d.day)
     for date, points in itertools.groupby(data,
@@ -103,11 +104,11 @@ def main():
         points = list(points)
         for v in variables:
             base = '/Volumes/ボリューム/JAMSTEC/'
-            base = ''
+            #base = ''
             fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}.gpv'\
                 .format(v, year, month, day)
-            fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}'\
-                .format(v, year, month, day)
+            #fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}'\
+            #    .format(v, year, month, day)
             values = numpy.fromfile(base + fname, '>f4')
             values.shape = (54, 442, 673)
             for depth in depths:

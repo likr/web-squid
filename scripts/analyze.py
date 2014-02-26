@@ -124,7 +124,7 @@ def main():
         result = {}
         indices = list(range(size))
         random.shuffle(indices)
-        indices = indices[:size // 10 * 5]
+        indices = indices[:size // 10 * 8]
         sample_data = {k: v[indices] for k, v in data.items()}
         labels, f, g, h, h6, gfi = estimate(sample_data)
         y = data['cpue']
