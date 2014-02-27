@@ -237,11 +237,22 @@ app.controller('MapController', ['$scope', function($scope) {
   function draw () {
     var v = $scope.selectedVariable;
     var d = $scope.selectedDepth;
-    var key = v + d;
+    var dateIndex = (() => {
+      var date = $scope.selectedDate;
+      var startDate : any = new Date(2006, 1, 10);
+      var dateIndex = (date - startDate) / 86400000;
+      if (dateIndex < 0) {
+        return 0;
+      } else if (dateIndex > 9) {
+        return 9;
+      }
+      return dateIndex;
+    })();
+    var key = dateIndex + v + d;
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/ocean.nc.dods?' + v.toLowerCase() + '[0][' + d + '][212:282][232:322]';
+      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/ocean.nc.dods?' + v.toLowerCase() + '[' + dateIndex + '][' + d + '][212:282][232:322]';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });
@@ -266,6 +277,12 @@ app.controller('MapController', ['$scope', function($scope) {
       if ($scope.view != 'hsi') {
         draw();
       }
+    }
+  });
+
+  $scope.$watch('selectedDate', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      draw();
     }
   });
 

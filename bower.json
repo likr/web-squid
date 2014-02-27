@@ -20,6 +20,7 @@
     "angular-route": "~1.2.13",
     "angular": "~1.2.13",
     "d3": "~3.4.2",
-    "threejs": "*"
+    "threejs": "*",
+    "angular-ui-date": "~0.0.3"
   }
 }

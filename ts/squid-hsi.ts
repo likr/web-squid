@@ -3,7 +3,7 @@
 
 
 module squid {
-export var app = angular.module('squid-hsi', ['ngRoute'])
+export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
   .factory('d3get', ['$q', function($q) {
     return function(xhr) {
       var deferred = $q.defer();
