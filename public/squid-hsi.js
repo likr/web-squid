@@ -493,9 +493,21 @@ var squid;
             $scope.SIFunction = createSIFunction();
 
             $scope.saveSI = function () {
+                var dateIndex = (function () {
+                    var date = $scope.selectedDate;
+                    var startDate = new Date(2006, 1, 10);
+                    var dateIndex = (date - startDate) / 86400000;
+                    if (dateIndex < 0) {
+                        return 0;
+                    } else if (dateIndex > 9) {
+                        return 9;
+                    }
+                    return dateIndex;
+                })();
                 $scope.SIs.push({
                     variable: $scope.selectedVariable,
                     depth: $scope.selectedDepth,
+                    date: dateIndex,
                     lambda: $scope.lambda,
                     SIFunction: $scope.SIFunction,
                     active: true
@@ -736,7 +748,7 @@ var squid;
                             var yi = d[1];
                             var hsi = 1;
                             SIs.forEach(function (SI) {
-                                hsi *= SI.SIFunction(dataCache[SI.variable + SI.depth][0][0][0][0][yi][xi]);
+                                hsi *= SI.SIFunction(dataCache[SI.date + SI.variable + SI.depth][0][0][0][0][yi][xi]);
                             });
                             return hsi;
                         });
