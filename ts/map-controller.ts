@@ -102,12 +102,15 @@ function createMesh(values, xList, yList, f) {
 
 app.controller('MapController', ['$scope', function($scope) {
   var debugMode = false;
+  var xRange = {min: mercatrProjection.lonToX(140), max: mercatrProjection.lonToX(149)},
+      yRange = {min: mercatrProjection.latToY(36), max: mercatrProjection.latToY(43)},
+      width = xRange.max - xRange.min,
+      height = yRange.max - yRange.min,
+      aspectRatio = height / width;
+
   // initialize renderer
   var stage = $('div#stage');
-  stage.css({
-    "height": "400px",
-    "width": "400px"
-    });
+  stage.height(aspectRatio * stage.width());
   var renderer = new THREE.WebGLRenderer(),
       rendererWidth  = stage.innerWidth(),
       rendererHeight = stage.innerHeight();
@@ -116,10 +119,9 @@ app.controller('MapController', ['$scope', function($scope) {
   stage.append(renderer.domElement);
 
   // initialize camera
-  var zoom = 100,
-      camerax = 230,
-      cameray = 160;
-  var camera = new THREE.OrthographicCamera(rendererWidth/-zoom, rendererWidth/zoom, rendererHeight/zoom, rendererHeight/-zoom, 1, 1000);
+  var camerax = (xRange.max + xRange.min)/2,
+      cameray = (yRange.max + yRange.min)/2;
+  var camera = new THREE.OrthographicCamera(width/-2, width/2, height/2, height/-2, 1, 2);
   camera.position.set(camerax, cameray, 1);
   camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
 
