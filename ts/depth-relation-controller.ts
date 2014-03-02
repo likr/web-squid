@@ -2,17 +2,29 @@
 /// <reference path="spline.ts"/>
 
 module squid {
-var svgWidth = 200;
-var svgHeight = 200;
-var svgMargin = 5;
+var svgWidth = 250;
+var svgHeight = 250;
+var svgMargin = 20;
 var maxDepth = 25;
 var xScale = d3.scale.linear()
   .domain([-1, 1])
   .range([svgMargin, svgWidth - svgMargin])
+  .nice()
   ;
 var yScale = d3.scale.linear()
   .domain([0, maxDepth])
   .range([svgMargin, svgHeight - svgMargin])
+  .nice()
+  ;
+var xAxis = d3.svg.axis()
+  .scale(xScale)
+  .orient("top")
+  .ticks(10)
+  ;
+var yAxis = d3.svg.axis()
+  .scale(yScale)
+  .orient("left")
+  .ticks(10)
   ;
 var line = d3.svg.line()
   .x(d => xScale(d[1]))
@@ -107,6 +119,15 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
       stroke: 'black'
     })
     ;
+
+  rootSelection.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + svgMargin + ")")
+    .call(xAxis);
+  rootSelection.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + (svgWidth / 2) + ",0)")
+    .call(yAxis);
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
     if (newValue !== oldValue) {

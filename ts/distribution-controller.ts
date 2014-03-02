@@ -5,9 +5,9 @@
 
 module squid {
 var nInterval = 100;
-var svgWidth = 200;
-var svgHeight = 200;
-var svgMargin = 5;
+var svgWidth = 250;
+var svgHeight = 250;
+var svgMargin = 20;
 
 function drawGraph(selection, data, key, lambda) {
   var xs = (() => {
@@ -35,6 +35,14 @@ function drawGraph(selection, data, key, lambda) {
     .domain([0, d3.max(data, d => +d['cpue'])])
     .range([svgWidth - svgMargin, svgMargin])
     ;
+  var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient("botom")
+    .ticks(10);
+  var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left")
+    .ticks(10);
   var line = d3.svg.line()
     .x(d => xScale(d))
     .y(d => yScale(interpolator.interpolate(d)))
@@ -53,6 +61,12 @@ function drawGraph(selection, data, key, lambda) {
       d: line(xs)
     })
     ;
+  transition
+    .select('g.x-axis')
+    .call(xAxis);
+  transition
+    .select('g.y-axis')
+    .call(yAxis);
 }
 
 
@@ -68,10 +82,19 @@ app.controller('DistributionController', ['$scope', function($scope) {
     }
     return xs;
   })();
+  var xScale = d3.scale.linear();
   var yScale = d3.scale.linear()
     .domain([0, d3.max(cpueVar, d => +d['cpue'])])
     .range([svgWidth - svgMargin, svgMargin])
     ;
+  var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient("bottom")
+    .ticks(10);
+  var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left")
+    .ticks(10);
   var rootSelection = d3.select('svg#distribution')
     .attr({
       width: svgWidth,
@@ -103,6 +126,15 @@ app.controller('DistributionController', ['$scope', function($scope) {
       stroke: 'red'
     })
     ;
+
+  rootSelection.append("g")
+    .classed('axis x-axis', true)
+    .attr("transform", "translate(0," + (svgHeight - svgMargin) + ")")
+    .call(xAxis);
+  rootSelection.append("g")
+    .classed('axis y-axis', true)
+    .attr("transform", "translate(" + svgMargin + ",0)")
+    .call(yAxis);
 
   function draw() {
     var xKey = $scope.selectedVariable + $scope.selectedDepth;
