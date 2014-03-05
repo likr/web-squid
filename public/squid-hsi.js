@@ -38,7 +38,23 @@ var squid;
                 resolve: {
                     cpueVar: [
                         'd3get', function (d3get) {
-                            return d3get(d3.csv('cpue-var.csv'));
+                            var id = 0;
+                            return d3get(d3.csv('cpue-var.csv').row(function (d) {
+                                var obj = {
+                                    id: id++,
+                                    x: +d.x,
+                                    y: +d.y,
+                                    date: new Date(d.stopDate),
+                                    cpue: +d.cpue
+                                };
+                                ['S', 'T', 'U', 'V', 'W'].forEach(function (v) {
+                                    var i;
+                                    for (i = 0; i < 54; ++i) {
+                                        obj[v + i] = +d[v + i];
+                                    }
+                                });
+                                return obj;
+                            }));
                         }]
                 }
             });
@@ -316,6 +332,12 @@ var squid;
                 }
             });
 
+            $scope.$watch('cpueVar', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    changeActivePoint(rootSelection, $scope.selectedDepth);
+                }
+            });
+
             drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
             changeActivePoint(rootSelection, $scope.selectedDepth);
         }]);
@@ -363,6 +385,19 @@ var squid;
         }).y(function (d) {
             return yScale(interpolator.interpolate(d));
         });
+        selection.selectAll('circle.data').data(data, function (d) {
+            return d.id;
+        }).call(function (selection) {
+            selection.enter().append('circle').classed('data', true).attr({
+                fill: 'black',
+                r: 1,
+                cx: 0,
+                cy: function (d) {
+                    return yScale(d.cpue);
+                }
+            });
+            selection.exit().remove();
+        });
         var transition = selection.transition();
         transition.selectAll('circle.data').attr({
             cx: function (d) {
@@ -402,14 +437,6 @@ var squid;
                 width: svgWidth,
                 height: svgHeight
             });
-            rootSelection.selectAll('circle.data').data(cpueVar).enter().append('circle').classed('data', true).attr({
-                fill: 'black',
-                r: 1,
-                cx: 0,
-                cy: function (d) {
-                    return yScale(d.cpue);
-                }
-            });
             var line = d3.svg.line().x(function (d) {
                 return d;
             }).y(function (d) {
@@ -426,7 +453,7 @@ var squid;
 
             function draw() {
                 var xKey = $scope.selectedVariable + $scope.selectedDepth;
-                drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+                drawGraph(rootSelection, $scope.cpueVar, xKey, $scope.lambda);
             }
 
             $scope.$watch('selectedVariable', function (newValue, oldValue) {
@@ -446,6 +473,12 @@ var squid;
                     if (0 < $scope.lambda && $scope.lambda <= 1) {
                         draw();
                     }
+                }
+            });
+
+            $scope.$watch('cpueVar', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    draw();
                 }
             });
 
@@ -473,39 +506,50 @@ var squid;
 /// <reference path="spline.ts"/>
 var squid;
 (function (squid) {
+    function createSIFunction(cpueVar, selectedVariable, selectedDepth, lambda) {
+        var key = selectedVariable + selectedDepth;
+        var interpolator = spline.interpolator(cpueVar, function (d) {
+            return +d[key];
+        }, function (d) {
+            return +d['cpue'];
+        }, lambda);
+        var maxVal = interpolator.max();
+        return function (x) {
+            if (x == 0) {
+                return NaN;
+            } else {
+                var v = interpolator.interpolate(x) / maxVal;
+                if (v > 1) {
+                    return 1;
+                } else if (v < 0) {
+                    return 0;
+                } else {
+                    return v;
+                }
+            }
+        };
+    }
+
     squid.app.controller('MainController', [
         '$scope', 'cpueVar', function ($scope, cpueVar) {
-            function createSIFunction() {
-                var key = $scope.selectedVariable + $scope.selectedDepth;
-                var interpolator = spline.interpolator($scope.cpueVar, function (d) {
-                    return +d[key];
-                }, function (d) {
-                    return +d['cpue'];
-                }, $scope.lambda);
-                var maxVal = interpolator.max();
-                return function (x) {
-                    if (x == 0) {
-                        return NaN;
-                    } else {
-                        var v = interpolator.interpolate(x) / maxVal;
-                        if (v > 1) {
-                            return 1;
-                        } else if (v < 0) {
-                            return 0;
-                        } else {
-                            return v;
-                        }
-                    }
-                };
+            function createCurrentSIFunction() {
+                return createSIFunction($scope.cpueVar, $scope.selectedVariable, $scope.selectedDepth, $scope.lambda);
             }
 
+            $scope.originalCpueVar = cpueVar;
             $scope.cpueVar = cpueVar;
             $scope.selectedVariable = 'S';
             $scope.selectedDepth = 0;
             $scope.selectedDate = new Date(2006, 1, 10);
+            $scope.cpueDateFrom = d3.min($scope.cpueVar, function (d) {
+                return d.date;
+            });
+            $scope.cpueDateTo = d3.max($scope.cpueVar, function (d) {
+                return d.date;
+            });
             $scope.lambda = 0.5;
             $scope.SIs = [];
-            $scope.SIFunction = createSIFunction();
+            $scope.SIFunction = createCurrentSIFunction();
 
             $scope.saveSI = function () {
                 var dateIndex = (function () {
@@ -531,19 +575,43 @@ var squid;
 
             $scope.$watch('selectedVariable', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
-                    $scope.SIFunction = createSIFunction();
+                    $scope.SIFunction = createCurrentSIFunction();
                 }
             });
 
             $scope.$watch('selectedDepth', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
-                    $scope.SIFunction = createSIFunction();
+                    $scope.SIFunction = createCurrentSIFunction();
                 }
             });
 
             $scope.$watch('lambda', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
-                    $scope.SIFunction = createSIFunction();
+                    $scope.SIFunction = createCurrentSIFunction();
+                }
+            });
+
+            $scope.$watch('cpueDateFrom', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    $scope.cpueVar = $scope.originalCpueVar.filter(function (d) {
+                        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+                    });
+                    $scope.SIFunction = createCurrentSIFunction();
+                    $scope.SIs.forEach(function (SI) {
+                        SI.SIFunction = createSIFunction($scope.cpueVar, SI.variable, SI.depth, SI.lambda);
+                    });
+                }
+            });
+
+            $scope.$watch('cpueDateTo', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    $scope.cpueVar = $scope.originalCpueVar.filter(function (d) {
+                        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+                    });
+                    $scope.SIFunction = createCurrentSIFunction();
+                    $scope.SIs.forEach(function (SI) {
+                        SI.SIFunction = createSIFunction($scope.cpueVar, SI.variable, SI.depth, SI.lambda);
+                    });
                 }
             });
         }]);
@@ -843,6 +911,15 @@ var squid;
             $scope.$watch('lambda', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
                     if ($scope.view == 'si') {
+                        draw();
+                    }
+                }
+            });
+
+            $scope.$watch('cpueVar', function (newValue, oldValue) {
+                console.log('map');
+                if (newValue !== oldValue) {
+                    if ($scope.view != 'variable') {
                         draw();
                     }
                 }
