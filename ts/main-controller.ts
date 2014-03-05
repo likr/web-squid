@@ -37,9 +37,21 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.SIFunction = createSIFunction();
 
   $scope.saveSI = () => {
+    var dateIndex = (() => {
+      var date = $scope.selectedDate;
+      var startDate : any = new Date(2006, 1, 10);
+      var dateIndex = (date - startDate) / 86400000;
+      if (dateIndex < 0) {
+        return 0;
+      } else if (dateIndex > 9) {
+        return 9;
+      }
+      return dateIndex;
+    })();
     $scope.SIs.push({
       variable: $scope.selectedVariable,
       depth: $scope.selectedDepth,
+      date: dateIndex,
       lambda: $scope.lambda,
       SIFunction: $scope.SIFunction,
       active: true
