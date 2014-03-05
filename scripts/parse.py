@@ -65,6 +65,8 @@ def load_row(row):
     date = datetime.strptime(row[5], '%m/%d/%Y %H:%M')
     o = Row(x, y, date)
     o.data.append(cpue)
+    o.data.append(x)
+    o.data.append(y)
     return o
 
 
@@ -90,7 +92,7 @@ def load_grid(filename):
 def main():
     variables = ['S', 'T', 'U', 'V', 'W']
     depths = range(54)
-    labels = ['cpue']
+    labels = ['cpue', 'x', 'y']
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     data = [o for o in data if
@@ -104,11 +106,11 @@ def main():
         points = list(points)
         for v in variables:
             base = '/Volumes/ボリューム/JAMSTEC/'
-            #base = ''
+            base = ''
             fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}.gpv'\
                 .format(v, year, month, day)
-            #fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}'\
-            #    .format(v, year, month, day)
+            fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}'\
+                .format(v, year, month, day)
             values = numpy.fromfile(base + fname, '>f4')
             values.shape = (54, 442, 673)
             for depth in depths:
