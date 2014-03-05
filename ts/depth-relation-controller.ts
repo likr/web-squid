@@ -147,6 +147,12 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
     }
   });
 
+  $scope.$watch('cpueVar', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      changeActivePoint(rootSelection, $scope.selectedDepth);
+    }
+  });
+
   drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
   changeActivePoint(rootSelection, $scope.selectedDepth);
 }]);

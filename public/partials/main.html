@@ -31,7 +31,15 @@
       <form class="form">
         <div class="form-group">
           <label>MOVE Date</label>
-          <input class="form-control" ui-date ng-model="selectedDate" min="2006-01-10" max="2006-01-19"/>
+          <input class="form-control" ui-date ng-model="selectedDate"/>
+        </div>
+        <div class="form-group">
+          <label>CPUE Date From</label>
+          <input class="form-control" ui-date ng-model="cpueDateFrom"/>
+        </div>
+        <div class="form-group">
+          <label>CPUE Date To</label>
+          <input class="form-control" ui-date ng-model="cpueDateTo"/>
         </div>
         <div class="form-group">
           <label>Variables</label>

@@ -296,6 +296,15 @@ app.controller('MapController', ['$scope', function($scope) {
     }
   });
 
+  $scope.$watch('cpueVar', (newValue, oldValue) => {
+    console.log('map');
+    if (newValue !== oldValue) {
+      if ($scope.view != 'variable') {
+        draw();
+      }
+    }
+  });
+
   $scope.$watch('view', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       draw();

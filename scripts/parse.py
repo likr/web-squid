@@ -62,11 +62,14 @@ def load_var(x, y, data, points, depth):
 def load_row(row):
     y, x = float(row[8]), float(row[9])
     cpue = float(row[44])
+    startDate = datetime.strptime(row[4], '%m/%d/%Y %H:%M')
     date = datetime.strptime(row[5], '%m/%d/%Y %H:%M')
     o = Row(x, y, date)
     o.data.append(cpue)
     o.data.append(x)
     o.data.append(y)
+    o.data.append(startDate.strftime('%d %b %Y %H:%M:%S GMT+0900'))
+    o.data.append(date.strftime('%d %b %Y %H:%M:%S GMT+0900'))
     return o
 
 
@@ -92,7 +95,7 @@ def load_grid(filename):
 def main():
     variables = ['S', 'T', 'U', 'V', 'W']
     depths = range(54)
-    labels = ['cpue', 'x', 'y']
+    labels = ['cpue', 'x', 'y', 'startDate', 'stopDate']
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     data = [o for o in data if
