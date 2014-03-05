@@ -47,6 +47,24 @@ function drawGraph(selection, data, key, lambda) {
     .x(d => xScale(d))
     .y(d => yScale(interpolator.interpolate(d)))
     ;
+  selection
+    .selectAll('circle.data')
+    .data(data, d => d.id)
+    .call(selection => {
+      selection.enter()
+        .append('circle')
+        .classed('data', true)
+        .attr({
+          fill: 'black',
+          r: 1,
+          cx: 0,
+          cy: d => yScale(d.cpue)
+        })
+        ;
+      selection.exit()
+        .remove()
+        ;
+    });
   var transition = selection.transition();
   transition
     .selectAll('circle.data')
@@ -100,19 +118,6 @@ app.controller('DistributionController', ['$scope', function($scope) {
       width: svgWidth,
       height: svgHeight
     });
-  rootSelection
-    .selectAll('circle.data')
-    .data(cpueVar)
-    .enter()
-    .append('circle')
-    .classed('data', true)
-    .attr({
-      fill: 'black',
-      r: 1,
-      cx: 0,
-      cy: d => yScale(d.cpue)
-    })
-    ;
   var line = d3.svg.line()
     .x(d => d)
     .y(d => initialY)
@@ -138,7 +143,7 @@ app.controller('DistributionController', ['$scope', function($scope) {
 
   function draw() {
     var xKey = $scope.selectedVariable + $scope.selectedDepth;
-    drawGraph(rootSelection, cpueVar, xKey, $scope.lambda);
+    drawGraph(rootSelection, $scope.cpueVar, xKey, $scope.lambda);
   }
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
@@ -158,6 +163,12 @@ app.controller('DistributionController', ['$scope', function($scope) {
       if (0 < $scope.lambda && $scope.lambda <= 1) {
         draw();
       }
+    }
+  });
+
+  $scope.$watch('cpueVar', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      draw();
     }
   });
 

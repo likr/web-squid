@@ -3,38 +3,46 @@
 
 
 module squid {
-app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar) {
-  function createSIFunction() {
-    var key = $scope.selectedVariable + $scope.selectedDepth;
-    var interpolator = spline.interpolator(
-      $scope.cpueVar,
-      d => +d[key],
-      d => +d['cpue'],
-      $scope.lambda);
-    var maxVal = interpolator.max()
-    return x => {
-      if (x == 0) {
-        return NaN;
+function createSIFunction(cpueVar, selectedVariable, selectedDepth, lambda) {
+  var key = selectedVariable + selectedDepth;
+  var interpolator = spline.interpolator(
+    cpueVar,
+    d => +d[key],
+    d => +d['cpue'],
+    lambda);
+  var maxVal = interpolator.max()
+  return x => {
+    if (x == 0) {
+      return NaN;
+    } else {
+      var v = interpolator.interpolate(x) / maxVal;
+      if (v > 1) {
+        return 1;
+      } else if (v < 0) {
+        return 0;
       } else {
-        var v = interpolator.interpolate(x) / maxVal;
-        if (v > 1) {
-          return 1;
-        } else if (v < 0) {
-          return 0;
-        } else {
-          return v;
-        }
+        return v;
       }
-    };
+    }
+  };
+}
+
+
+app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar) {
+  function createCurrentSIFunction() {
+    return createSIFunction($scope.cpueVar, $scope.selectedVariable, $scope.selectedDepth, $scope.lambda);
   }
 
+  $scope.originalCpueVar = cpueVar;
   $scope.cpueVar = cpueVar;
   $scope.selectedVariable = 'S';
   $scope.selectedDepth = 0;
   $scope.selectedDate = new Date(2006, 1, 10);
+  $scope.cpueDateFrom = d3.min($scope.cpueVar, (d : any) => d.date);
+  $scope.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
   $scope.lambda = 0.5;
   $scope.SIs = [];
-  $scope.SIFunction = createSIFunction();
+  $scope.SIFunction = createCurrentSIFunction();
 
   $scope.saveSI = () => {
     var dateIndex = (() => {
@@ -60,19 +68,43 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
     if (newValue !== oldValue) {
-      $scope.SIFunction = createSIFunction();
+      $scope.SIFunction = createCurrentSIFunction();
     }
   });
 
   $scope.$watch('selectedDepth', (newValue, oldValue) => {
     if (newValue !== oldValue) {
-      $scope.SIFunction = createSIFunction();
+      $scope.SIFunction = createCurrentSIFunction();
     }
   });
 
   $scope.$watch('lambda', (newValue, oldValue) => {
     if (newValue !== oldValue) {
-      $scope.SIFunction = createSIFunction();
+      $scope.SIFunction = createCurrentSIFunction();
+    }
+  });
+
+  $scope.$watch('cpueDateFrom', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      $scope.cpueVar = $scope.originalCpueVar.filter(d => {
+        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+      });
+      $scope.SIFunction = createCurrentSIFunction();
+      $scope.SIs.forEach(SI => {
+        SI.SIFunction = createSIFunction($scope.cpueVar, SI.variable, SI.depth, SI.lambda);
+      });
+    }
+  });
+
+  $scope.$watch('cpueDateTo', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      $scope.cpueVar = $scope.originalCpueVar.filter(d => {
+        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+      });
+      $scope.SIFunction = createCurrentSIFunction();
+      $scope.SIs.forEach(SI => {
+        SI.SIFunction = createSIFunction($scope.cpueVar, SI.variable, SI.depth, SI.lambda);
+      });
     }
   });
 }]);

@@ -674,6 +674,9 @@ declare module D3 {
         * @param listener Function to attach to event
         */
         on: (type: string, listener: (data: any, index?: number) => any) => Xhr;
+        /**
+        */
+        row(f: (d:any) => any): Xhr;
     }
 
     export interface Dsv {

@@ -44,7 +44,23 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
         templateUrl: 'partials/main.html',
         resolve: {
           cpueVar: ['d3get', function(d3get) {
-            return d3get(d3.csv('cpue-var.csv'));
+            var id = 0;
+            return d3get(d3.csv('cpue-var.csv').row(d => {
+              var obj = {
+                id: id++,
+                x: +d.x,
+                y: +d.y,
+                date: new Date(d.stopDate),
+                cpue: +d.cpue,
+              };
+              ['S', 'T', 'U', 'V', 'W'].forEach(v => {
+                var i;
+                for (i = 0; i < 54; ++i) {
+                  obj[v + i] = +d[v + i];
+                }
+              });
+              return obj;
+            }));
           }]
         }
       })
