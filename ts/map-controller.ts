@@ -197,7 +197,7 @@ app.controller('MapController', ['$scope', function($scope) {
       dataType: 'text',
       async: false,
       success: function(csv) {
-        points = CSVToArray(csv, ',');
+        var points = CSVToArray(csv, ',');
         points.shift();
         var geometry = new THREE.Geometry();
         var material = new THREE.ParticleSystemMaterial( { color:0x333333, size: 3, sizeAttenuation: false } );
