@@ -540,7 +540,7 @@ var squid;
             $scope.cpueVar = cpueVar;
             $scope.selectedVariable = 'S';
             $scope.selectedDepth = 0;
-            $scope.selectedDate = new Date(2006, 1, 10);
+            $scope.selectedDate = new Date(2006, 0, 10);
             $scope.cpueDateFrom = d3.min($scope.cpueVar, function (d) {
                 return d.date;
             });
@@ -554,7 +554,7 @@ var squid;
             $scope.saveSI = function () {
                 var dateIndex = (function () {
                     var date = $scope.selectedDate;
-                    var startDate = new Date(2006, 1, 10);
+                    var startDate = new Date(2006, 0, 10);
                     var dateIndex = (date - startDate) / 86400000;
                     if (dateIndex < 0) {
                         return 0;
@@ -720,6 +720,30 @@ var squid;
         return new THREE.Mesh(geo, material);
     }
 
+    function CSVToArray(strData, strDelimiter) {
+        strDelimiter = (strDelimiter || ",");
+        var objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" + "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" + "([^\"\\" + strDelimiter + "\\r\\n]*))"), "gi");
+
+        var arrData = [[]];
+        var arrMatches = null;
+        while (arrMatches = objPattern.exec(strData)) {
+            var strMatchedDelimiter = arrMatches[1];
+            if (strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)) {
+                arrData.push([]);
+            }
+
+            if (arrMatches[2]) {
+                var strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
+            } else {
+                var strMatchedValue = arrMatches[3];
+            }
+
+            arrData[arrData.length - 1].push(strMatchedValue);
+        }
+
+        return (arrData);
+    }
+
     squid.app.controller('MapController', [
         '$scope', function ($scope) {
             var debugMode = false;
@@ -768,6 +792,35 @@ var squid;
                     }
                     var line = new THREE.Line(geometry, material);
                     scene.add(line);
+                });
+            };
+
+            var markPoints = function () {
+                var arr;
+                $.ajax({
+                    url: 'cpue-var.csv',
+                    type: 'get',
+                    dataType: 'text',
+                    async: false,
+                    success: function (csv) {
+                        points = CSVToArray(csv, ',');
+                        points.shift();
+                        var geometry = new THREE.Geometry();
+                        var material = new THREE.ParticleSystemMaterial({ color: 0x333333, size: 3, sizeAttenuation: false });
+
+                        for (var i = 0; i < points.length; i++) {
+                            var p = points[i];
+                            var vertex = new THREE.Vector3();
+                            vertex.x = mercatrProjection.lonToX(p[1]);
+                            vertex.y = mercatrProjection.latToY(p[2]);
+                            vertex.z = 0;
+
+                            geometry.vertices.push(vertex);
+                        }
+
+                        var particles = new THREE.ParticleSystem(geometry, material);
+                        scene.add(particles);
+                    }
                 });
             };
 
@@ -861,7 +914,7 @@ var squid;
                 var d = $scope.selectedDepth;
                 var dateIndex = (function () {
                     var date = $scope.selectedDate;
-                    var startDate = new Date(2006, 1, 10);
+                    var startDate = new Date(2006, 0, 10);
                     var dateIndex = (date - startDate) / 86400000;
                     if (dateIndex < 0) {
                         return 0;
@@ -882,6 +935,7 @@ var squid;
             }
             render();
             drawCoastLine();
+            markPoints();
             draw();
 
             $scope.view = 'variable';
@@ -917,7 +971,6 @@ var squid;
             });
 
             $scope.$watch('cpueVar', function (newValue, oldValue) {
-                console.log('map');
                 if (newValue !== oldValue) {
                     if ($scope.view != 'variable') {
                         draw();
