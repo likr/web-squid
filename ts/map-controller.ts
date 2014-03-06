@@ -152,6 +152,7 @@ app.controller('MapController', ['$scope', function($scope) {
     });
   };
 
+  var particles;
   var markPoints = function () {
     if (particles !== undefined) {
       scene.remove(particles);
@@ -170,7 +171,7 @@ app.controller('MapController', ['$scope', function($scope) {
       geometry.vertices.push( vertex );
     }
 
-    var particles = new THREE.ParticleSystem( geometry, material );
+    particles = new THREE.ParticleSystem(geometry, material);
     scene.add( particles );
   };
 
@@ -322,8 +323,8 @@ app.controller('MapController', ['$scope', function($scope) {
     if (newValue !== oldValue) {
       if ($scope.view != 'variable') {
         draw();
-        markPoints();
       }
+      markPoints();
     }
   });
 
