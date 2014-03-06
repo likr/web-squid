@@ -72,7 +72,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   };
 
   $scope.incrementDepth = () => {
-    $scope.selectedDepth = Math.min($scope.depthMax, $scope.selectedDepth + 1);
+    $scope.selectedDepth = Math.min($scope.depthMax, +$scope.selectedDepth + 1);
   };
 
   $scope.decrementDepth = () => {
@@ -80,7 +80,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   };
 
   $scope.incrementLambda = () => {
-    $scope.lambda = Math.min($scope.lambdaMax, $scope.lambda + $scope.lambdaStep);
+    $scope.lambda = Math.min($scope.lambdaMax, +$scope.lambda + $scope.lambdaStep);
   };
 
   $scope.decrementLambda = () => {

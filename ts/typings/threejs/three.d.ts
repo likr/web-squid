@@ -3947,7 +3947,7 @@ declare module THREE {
         wireframe?: boolean;
         wireframeLinewidth?: number;
         lights?: boolean;
-        vertexColors?: Colors;
+        vertexColors?: boolean;
         skinning?: boolean;
         morphTargets?: boolean;
         morphNormals?: boolean;
@@ -3986,7 +3986,7 @@ declare module THREE {
         wireframeLinewidth: number;
         fog: boolean;
         lights: boolean;
-        vertexColors: Colors;
+        vertexColors: boolean;
         skinning: boolean;
         morphTargets: boolean;
         morphNormals: boolean;
