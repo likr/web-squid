@@ -128,28 +128,22 @@ app.controller('MapController', ['$scope', function($scope) {
   var scene = new THREE.Scene();
 
   var drawCoastLine = function () {
-    // load gml
-    var gml;
-    $.ajax({
-      url: "data/coastl_jpn.gml",
-      dataType: "xml",
-      async: false,
-      error: function () { alert('Error loading XML document'); },
-      success: function (data) { gml = data; }
-    });
-
-    // draw coast line
-    var material = new THREE.LineBasicMaterial({ color: 0x000000 });
-    $(gml).find('coastl').each(function() {
-      var posList = $(this).find('posList')[0].innerHTML.split(' ');
-      var geometry = new THREE.Geometry();
-      for (var i = 0, len = posList.length; i < len - 1; i += 2) {
-        var vertice = new THREE.Vector3(mercatrProjection.lonToX(posList[i + 1]), mercatrProjection.latToY(posList[i]), 0);
-        geometry.vertices.push(vertice);
-      }
-      var line = new THREE.Line(geometry, material);
-      scene.add(line);
-    });
+    d3.json('data/coastl_jpn.json')
+      .on('load', data => {
+        var lineMaterial = new THREE.LineBasicMaterial({color: 0x000000});
+        data.forEach(row => {
+          var geometry = new THREE.Geometry();
+          row.forEach(pos => {
+            var x = mercatrProjection.lonToX(pos[1]);
+            var y = mercatrProjection.latToY(pos[0]);
+            var vertice = new THREE.Vector3(x, y, 0);
+            geometry.vertices.push(vertice);
+          });
+          var line = new THREE.Line(geometry, lineMaterial);
+          scene.add(line);
+        });
+      })
+      .get();
   };
 
   var particles;
