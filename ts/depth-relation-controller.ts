@@ -90,6 +90,15 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
     .attr({
       width: svgWidth,
       height: svgHeight
+    })
+    .on('click', () => {
+      var pos = d3.mouse(rootSelection.node());
+      var depth = Math.floor((pos[1] - svgMargin) / (svgHeight - svgMargin * 2)* (maxDepth + 1));
+      if (0 <= depth && depth <= maxDepth) {
+        $scope.$apply(() => {
+          $scope.$parent.selectedDepth = depth;
+        });
+      }
     });
   rootSelection.append('g')
     .classed('points', true)
