@@ -241,7 +241,7 @@ app.controller('MapController', ['$scope', function($scope) {
     var d = $scope.selectedDepth;
     var dateIndex = (() => {
       var date = $scope.selectedDate;
-      var startDate : any = new Date(2006, 1, 10);
+      var startDate : any = new Date(2006, 0, 10);
       var dateIndex = (date - startDate) / 86400000;
       if (dateIndex < 0) {
         return 0;
