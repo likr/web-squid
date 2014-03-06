@@ -37,7 +37,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.cpueVar = cpueVar;
   $scope.selectedVariable = 'S';
   $scope.selectedDepth = 0;
-  $scope.selectedDate = new Date(2006, 1, 10);
+  $scope.selectedDate = new Date(2006, 0, 10);
   $scope.cpueDateFrom = d3.min($scope.cpueVar, (d : any) => d.date);
   $scope.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
   $scope.lambda = 0.5;
@@ -47,7 +47,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.saveSI = () => {
     var dateIndex = (() => {
       var date = $scope.selectedDate;
-      var startDate : any = new Date(2006, 1, 10);
+      var startDate : any = new Date(2006, 0, 10);
       var dateIndex = (date - startDate) / 86400000;
       if (dateIndex < 0) {
         return 0;
