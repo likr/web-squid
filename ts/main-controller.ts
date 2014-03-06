@@ -43,6 +43,11 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.lambda = 0.5;
   $scope.SIs = [];
   $scope.SIFunction = createCurrentSIFunction();
+  $scope.depthMin = 0;
+  $scope.depthMax = 25;
+  $scope.lambdaMin = 0.001;
+  $scope.lambdaMax = 1;
+  $scope.lambdaStep = 0.001;
 
   $scope.saveSI = () => {
     var dateIndex = (() => {
@@ -64,6 +69,22 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
       SIFunction: $scope.SIFunction,
       active: true
     });
+  };
+
+  $scope.incrementDepth = () => {
+    $scope.selectedDepth = Math.min($scope.depthMax, $scope.selectedDepth + 1);
+  };
+
+  $scope.decrementDepth = () => {
+    $scope.selectedDepth = Math.max($scope.depthMin, $scope.selectedDepth - 1);
+  };
+
+  $scope.incrementLambda = () => {
+    $scope.lambda = Math.min($scope.lambdaMax, $scope.lambda + $scope.lambdaStep);
+  };
+
+  $scope.decrementLambda = () => {
+    $scope.lambda = Math.max($scope.lambdaMin, $scope.lambda - $scope.lambdaStep);
   };
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
