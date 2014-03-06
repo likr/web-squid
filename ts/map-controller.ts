@@ -153,17 +153,37 @@ app.controller('MapController', ['$scope', function($scope) {
     }
     var points = $scope.cpueVar;
     var geometry = new THREE.Geometry();
-    var material = new THREE.ParticleSystemMaterial( { color:0x333333, size: 3, sizeAttenuation: false } );
+    var material = new THREE.ParticleSystemMaterial({
+      size: 5,
+      sizeAttenuation: false,
+      vertexColors: true
+    });
 
+    var cpueArr = new Array();
+    for (var j = points.length; j--;) {
+      cpueArr.push(points[j].cpue);
+    }
+    var _cpueArr = $.grep(cpueArr, function(e){return e;});
+    var max = d3.max(_cpueArr);
+    var min = d3.min(_cpueArr);
+    var scale = d3.scale.linear()
+                  .domain([min, max])
+                  .range([240, 360]);
+    var _numTo16Color = function (num) {
+      return d3.hsl("hsl("+scale(num)+",100%,50%)").toString();
+    };
+
+    var colors = [];
     for ( var i = 0; i < points.length; i ++ ) {
       var p = points[i];
       var vertex = new THREE.Vector3();
       vertex.x = mercatrProjection.lonToX(p.x);
       vertex.y = mercatrProjection.latToY(p.y);
       vertex.z = 0;
-
       geometry.vertices.push( vertex );
+      colors[i] = new THREE.Color(_numTo16Color(p.cpue));
     }
+    geometry.colors = colors;
 
     particles = new THREE.ParticleSystem(geometry, material);
     scene.add( particles );
