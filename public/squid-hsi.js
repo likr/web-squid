@@ -291,6 +291,14 @@ var squid;
             var rootSelection = d3.select('svg#depth-relation').attr({
                 width: svgWidth,
                 height: svgHeight
+            }).on('click', function () {
+                var pos = d3.mouse(rootSelection.node());
+                var depth = Math.floor((pos[1] - svgMargin) / (svgHeight - svgMargin * 2) * (maxDepth + 1));
+                if (0 <= depth && depth <= maxDepth) {
+                    $scope.$apply(function () {
+                        $scope.$parent.selectedDepth = depth;
+                    });
+                }
             });
             rootSelection.append('g').classed('points', true).selectAll('circle.point').data(Rs).enter().append('circle').classed('point', true).attr({
                 fill: 'black',
@@ -550,6 +558,11 @@ var squid;
             $scope.lambda = 0.5;
             $scope.SIs = [];
             $scope.SIFunction = createCurrentSIFunction();
+            $scope.depthMin = 0;
+            $scope.depthMax = 25;
+            $scope.lambdaMin = 0.001;
+            $scope.lambdaMax = 1;
+            $scope.lambdaStep = 0.001;
 
             $scope.saveSI = function () {
                 var dateIndex = (function () {
@@ -571,6 +584,22 @@ var squid;
                     SIFunction: $scope.SIFunction,
                     active: true
                 });
+            };
+
+            $scope.incrementDepth = function () {
+                $scope.selectedDepth = Math.min($scope.depthMax, $scope.selectedDepth + 1);
+            };
+
+            $scope.decrementDepth = function () {
+                $scope.selectedDepth = Math.max($scope.depthMin, $scope.selectedDepth - 1);
+            };
+
+            $scope.incrementLambda = function () {
+                $scope.lambda = Math.min($scope.lambdaMax, $scope.lambda + $scope.lambdaStep);
+            };
+
+            $scope.decrementLambda = function () {
+                $scope.lambda = Math.max($scope.lambdaMin, $scope.lambda - $scope.lambdaStep);
             };
 
             $scope.$watch('selectedVariable', function (newValue, oldValue) {
@@ -720,30 +749,6 @@ var squid;
         return new THREE.Mesh(geo, material);
     }
 
-    function CSVToArray(strData, strDelimiter) {
-        strDelimiter = (strDelimiter || ",");
-        var objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" + "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" + "([^\"\\" + strDelimiter + "\\r\\n]*))"), "gi");
-
-        var arrData = [[]];
-        var arrMatches = null;
-        while (arrMatches = objPattern.exec(strData)) {
-            var strMatchedDelimiter = arrMatches[1];
-            if (strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)) {
-                arrData.push([]);
-            }
-
-            if (arrMatches[2]) {
-                var strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
-            } else {
-                var strMatchedValue = arrMatches[3];
-            }
-
-            arrData[arrData.length - 1].push(strMatchedValue);
-        }
-
-        return (arrData);
-    }
-
     squid.app.controller('MapController', [
         '$scope', function ($scope) {
             var debugMode = false;
@@ -767,61 +772,43 @@ var squid;
             var scene = new THREE.Scene();
 
             var drawCoastLine = function () {
-                // load gml
-                var gml;
-                $.ajax({
-                    url: "data/coastl_jpn.gml",
-                    dataType: "xml",
-                    async: false,
-                    error: function () {
-                        alert('Error loading XML document');
-                    },
-                    success: function (data) {
-                        gml = data;
-                    }
-                });
-
-                // draw coast line
-                var material = new THREE.LineBasicMaterial({ color: 0x000000 });
-                $(gml).find('coastl').each(function () {
-                    var posList = $(this).find('posList')[0].innerHTML.split(' ');
-                    var geometry = new THREE.Geometry();
-                    for (var i = 0, len = posList.length; i < len - 1; i += 2) {
-                        var vertice = new THREE.Vector3(mercatrProjection.lonToX(posList[i + 1]), mercatrProjection.latToY(posList[i]), 0);
-                        geometry.vertices.push(vertice);
-                    }
-                    var line = new THREE.Line(geometry, material);
-                    scene.add(line);
-                });
+                d3.json('data/coastl_jpn.json').on('load', function (data) {
+                    var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+                    data.forEach(function (row) {
+                        var geometry = new THREE.Geometry();
+                        row.forEach(function (pos) {
+                            var x = mercatrProjection.lonToX(pos[1]);
+                            var y = mercatrProjection.latToY(pos[0]);
+                            var vertice = new THREE.Vector3(x, y, 0);
+                            geometry.vertices.push(vertice);
+                        });
+                        var line = new THREE.Line(geometry, lineMaterial);
+                        scene.add(line);
+                    });
+                }).get();
             };
 
+            var particles;
             var markPoints = function () {
-                var arr;
-                $.ajax({
-                    url: 'cpue-var.csv',
-                    type: 'get',
-                    dataType: 'text',
-                    async: false,
-                    success: function (csv) {
-                        points = CSVToArray(csv, ',');
-                        points.shift();
-                        var geometry = new THREE.Geometry();
-                        var material = new THREE.ParticleSystemMaterial({ color: 0x333333, size: 3, sizeAttenuation: false });
+                if (particles !== undefined) {
+                    scene.remove(particles);
+                }
+                var points = $scope.cpueVar;
+                var geometry = new THREE.Geometry();
+                var material = new THREE.ParticleSystemMaterial({ color: 0x333333, size: 3, sizeAttenuation: false });
 
-                        for (var i = 0; i < points.length; i++) {
-                            var p = points[i];
-                            var vertex = new THREE.Vector3();
-                            vertex.x = mercatrProjection.lonToX(p[1]);
-                            vertex.y = mercatrProjection.latToY(p[2]);
-                            vertex.z = 0;
+                for (var i = 0; i < points.length; i++) {
+                    var p = points[i];
+                    var vertex = new THREE.Vector3();
+                    vertex.x = mercatrProjection.lonToX(p.x);
+                    vertex.y = mercatrProjection.latToY(p.y);
+                    vertex.z = 0;
 
-                            geometry.vertices.push(vertex);
-                        }
+                    geometry.vertices.push(vertex);
+                }
 
-                        var particles = new THREE.ParticleSystem(geometry, material);
-                        scene.add(particles);
-                    }
-                });
+                particles = new THREE.ParticleSystem(geometry, material);
+                scene.add(particles);
             };
 
             var drawGrid = function (xList, yList) {
@@ -975,6 +962,7 @@ var squid;
                     if ($scope.view != 'variable') {
                         draw();
                     }
+                    markPoints();
                 }
             });
 
