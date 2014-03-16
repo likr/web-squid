@@ -108,7 +108,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.$watch('cpueDateFrom', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       $scope.cpueVar = $scope.originalCpueVar.filter(d => {
-        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+        return $scope.cpueDateFrom <= d.date && d.date <= +$scope.cpueDateTo + 86400000;
       });
       $scope.SIFunction = createCurrentSIFunction();
       $scope.SIs.forEach(SI => {
@@ -120,7 +120,7 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.$watch('cpueDateTo', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       $scope.cpueVar = $scope.originalCpueVar.filter(d => {
-        return $scope.cpueDateFrom <= d.date && d.date <= $scope.cpueDateTo;
+        return $scope.cpueDateFrom <= d.date && d.date <= +$scope.cpueDateTo + 86400000;
       });
       $scope.SIFunction = createCurrentSIFunction();
       $scope.SIs.forEach(SI => {

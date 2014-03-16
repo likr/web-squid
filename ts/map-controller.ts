@@ -151,42 +151,46 @@ app.controller('MapController', ['$scope', function($scope) {
     if (particles !== undefined) {
       scene.remove(particles);
     }
-    var points = $scope.cpueVar;
-    var geometry = new THREE.Geometry();
-    var material = new THREE.ParticleSystemMaterial({
-      size: 5,
-      sizeAttenuation: false,
-      vertexColors: true
-    });
+    if ($scope.showWholeCPUE || $scope.showExpectedCPUE) {
+      var points = $scope.showWholeCPUE ? $scope.cpueVar : [];
+      if ($scope.showExpectedCPUE) {
+        if (!$scope.showWholeCPUE || $scope.selectedDate < $scope.cpueDateFrom || $scope.cpueDateTo < $scope.selectedDate) {
+          points = points.concat($scope.originalCpueVar.filter(point => {
+            return point.date.getFullYear() == $scope.selectedDate.getFullYear()
+            && point.date.getMonth() == $scope.selectedDate.getMonth()
+            && point.date.getDate() == $scope.selectedDate.getDate();
+          }));
+        }
+      }
+      var geometry = new THREE.Geometry();
+      var material = new THREE.ParticleSystemMaterial({
+        size: 5,
+        sizeAttenuation: false,
+        vertexColors: true
+      });
 
-    var cpueArr = new Array();
-    for (var j = points.length; j--;) {
-      cpueArr.push(points[j].cpue);
+      var scale = d3.scale.linear()
+                    .domain(d3.extent(points, (p : any) => p.cpue))
+                    .range([240, 360]);
+      var _numTo16Color = function (num) {
+        return d3.hsl("hsl("+scale(num)+",100%,50%)").toString();
+      };
+
+      var colors = [];
+      for ( var i = 0; i < points.length; i ++ ) {
+        var p = points[i];
+        var vertex = new THREE.Vector3();
+        vertex.x = mercatrProjection.lonToX(p.x);
+        vertex.y = mercatrProjection.latToY(p.y);
+        vertex.z = 0;
+        geometry.vertices.push( vertex );
+        colors[i] = new THREE.Color(_numTo16Color(p.cpue));
+      }
+      geometry.colors = colors;
+
+      particles = new THREE.ParticleSystem(geometry, material);
+      scene.add(particles);
     }
-    var _cpueArr = $.grep(cpueArr, function(e){return e;});
-    var max = d3.max(_cpueArr);
-    var min = d3.min(_cpueArr);
-    var scale = d3.scale.linear()
-                  .domain([min, max])
-                  .range([240, 360]);
-    var _numTo16Color = function (num) {
-      return d3.hsl("hsl("+scale(num)+",100%,50%)").toString();
-    };
-
-    var colors = [];
-    for ( var i = 0; i < points.length; i ++ ) {
-      var p = points[i];
-      var vertex = new THREE.Vector3();
-      vertex.x = mercatrProjection.lonToX(p.x);
-      vertex.y = mercatrProjection.latToY(p.y);
-      vertex.z = 0;
-      geometry.vertices.push( vertex );
-      colors[i] = new THREE.Color(_numTo16Color(p.cpue));
-    }
-    geometry.colors = colors;
-
-    particles = new THREE.ParticleSystem(geometry, material);
-    scene.add( particles );
   };
 
   var drawGrid = function (xList, yList) {
@@ -296,12 +300,10 @@ app.controller('MapController', ['$scope', function($scope) {
       });
     }
   }
-  render();
-  drawCoastLine();
-  markPoints();
-  draw();
 
   $scope.view = 'variable';
+  $scope.showWholeCPUE = true;
+  $scope.showExpectedCPUE = false;
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
     if (newValue !== oldValue) {
@@ -348,6 +350,18 @@ app.controller('MapController', ['$scope', function($scope) {
     }
   });
 
+  $scope.$watch('showWholeCPUE', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      markPoints();
+    }
+  });
+
+  $scope.$watch('showExpectedCPUE', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      markPoints();
+    }
+  });
+
   $scope.$watch('SIs.length', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       if ($scope.view == 'hsi') {
@@ -367,5 +381,10 @@ app.controller('MapController', ['$scope', function($scope) {
       }
     }
   });
+
+  render();
+  drawCoastLine();
+  markPoints();
+  draw();
 }]);
 }
