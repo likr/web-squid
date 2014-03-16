@@ -93,16 +93,18 @@ def load_grid(filename):
 
 
 def main():
-    variables = ['S', 'T', 'U', 'V', 'W']
+    variables_3d = ['S', 'T', 'U', 'V', 'W']
+    variables_2d = ['HM']
+    variables = variables_3d + variables_2d
     depths = range(54)
     labels = ['cpue', 'x', 'y', 'startDate', 'stopDate']
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     data = [o for o in data if
-            True]
-            #(2006, 1, 10) <= (o.year, o.month, o.day) <= (2006, 1, 19)]
+            #True]
+            (2006, 1, 10) <= (o.year, o.month, o.day) <= (2006, 1, 19)]
     x, y, _ = load_grid('S/S3D_intpo.ctl')
-    data.sort(key=lambda d: d.day)
+    data.sort(key=lambda d: (d.year, d.month, d.day))
     for date, points in itertools.groupby(data,
                                           lambda o: (o.year, o.month, o.day)):
         year, month, day = date
@@ -110,18 +112,19 @@ def main():
         for v in variables:
             base = '/Volumes/ボリューム/JAMSTEC/'
             base = ''
-            fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}.gpv'\
-                .format(v, year, month, day)
-            fname = '{0}/{0}3D_intpo.{1:04}{2:02}{3:02}'\
-                .format(v, year, month, day)
+            fname = '{0}/{0}{4}_intpo.{1:04}{2:02}{3:02}.gpv'\
+                .format(v, year, month, day, '' if v == 'HM' else '3D')
             values = numpy.fromfile(base + fname, '>f4')
-            values.shape = (54, 442, 673)
+            values.shape = (1 if v == 'HM' else 54, 442, 673)
             for depth in depths:
                 label = '{0:04}{1:02}{2:02}-{3}-{4}'\
                     .format(year, month, day, v, depth)
                 print(label)
                 load_var(x, y, values, points, depth)
-    labels.extend('{0}{1}'.format(v, d) for v in variables for d in depths)
+                if v == 'HM':
+                    break
+    labels.extend('{0}{1}'.format(v, d) for v in variables_3d for d in depths)
+    labels.extend('{0}0'.format(v) for v in variables_2d)
     writer = csv.writer(open('cpue-var.csv', 'w'))
     writer.writerow(labels)
     writer.writerows([row.data for row in data])

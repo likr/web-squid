@@ -277,7 +277,7 @@ app.controller('MapController', ['$scope', function($scope) {
     paint(values, xList, yList);
   }
   function draw () {
-    var v = $scope.selectedVariable;
+    var v = $scope.selectedVariable.toLowerCase();
     var d = $scope.selectedDepth;
     var dateIndex = (() => {
       var date = $scope.selectedDate;
@@ -294,7 +294,7 @@ app.controller('MapController', ['$scope', function($scope) {
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/ocean.nc.dods?' + v.toLowerCase() + '[' + dateIndex + '][' + d + '][212:282][232:322]';
+      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/' + v + '.nc.dods?' + v + '[' + dateIndex + '][' + d + '][212:282][232:322]';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });

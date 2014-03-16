@@ -32,6 +32,8 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
           return 'Horizontal Velocity (Lon.)';
         case 'W':
           return 'Vertical Velocity';
+        case 'HM':
+          return 'Sea Surface Height';
         default:
           return '';
       }
@@ -52,6 +54,7 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
                 y: +d.y,
                 date: new Date(d.stopDate),
                 cpue: +d.cpue,
+                HM0: +d.HM0,
               };
               ['S', 'T', 'U', 'V', 'W'].forEach(v => {
                 var i;
