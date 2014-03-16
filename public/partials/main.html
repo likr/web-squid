@@ -2,7 +2,6 @@
   <h1>HSI Modeling Support</h2>
   <div class="col-xs-6">
     <div  ng-controller="MapController">
-      <h2>Map</h2>
       <div id="stage"></div>
       <form class="form">
         <label>View</label>
@@ -32,19 +31,20 @@
   </div>
   <div class="col-xs-6">
     <div class="row">
-      <h2>Control</h2>
       <form class="form">
-        <div class="form-group">
-          <label>MOVE Date</label>
-          <input class="form-control" ui-date ng-model="selectedDate"/>
-        </div>
-        <div class="form-group">
-          <label>CPUE Date From</label>
-          <input class="form-control" ui-date ng-model="cpueDateFrom"/>
-        </div>
-        <div class="form-group">
-          <label>CPUE Date To</label>
-          <input class="form-control" ui-date ng-model="cpueDateTo"/>
+        <div class="row">
+          <div class="form-group col-xs-4">
+            <label>MOVE Date</label>
+            <input class="form-control" ui-date ng-model="selectedDate"/>
+          </div>
+          <div class="form-group col-xs-4">
+            <label>CPUE Date From</label>
+            <input class="form-control" ui-date ng-model="cpueDateFrom"/>
+          </div>
+          <div class="form-group col-xs-4">
+            <label>CPUE Date To</label>
+            <input class="form-control" ui-date ng-model="cpueDateTo"/>
+          </div>
         </div>
         <div class="form-group">
           <label>Variables</label>
