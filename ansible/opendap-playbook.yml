@@ -3,6 +3,11 @@
     proxy_env:
       http_proxy: http://proxy.kuins.net:8080
       https_proxy: http://proxy.kuins.net:8080
+    gds_env:
+      GADDIR: /usr/share/grads/
+      JAVA: /usr/bin/java
+      JAVA_HOME: /usr/bin/java
+      JAVA_OPTS: -Xms512M -Xmx1024M
   sudo: yes
   tasks:
     #- name: fetch rpmforge rpm
@@ -13,6 +18,11 @@
 
     #- name: install gdal
     #  yum: name=gdal state=present
+
+    - name: install libselinux-python
+      yum: name=libselinux-python
+      environment: proxy_env
+
     - name: fetch epel rpm
       get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-5-4.noarch.rpm
       environment: proxy_env
@@ -124,15 +134,12 @@
     - name: add gds.xml
       copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
 
-    - name: add .bashrc
-      copy: src=.bashrc dest=~/.bashrc
-
-    - name: source .bashrc
-      command: source ~/.bashrc
+    - name: add server.xml
+      command: cp /var/lib/gds-2.0/tomcat4/conf/server-examples.xml /var/lib/gds-2.0/tomcat4/conf/server.xml creates=/var/lib/gds-2.0/tomcat4/conf/server.xml
 
     - name: restart gds
       command: /var/lib/gds-2.0/rebootserver
-
+      environment: gds_env
 
     #- name: fetch cors-filter
     #  get_url: url=http://search.maven.org/remotecontent?filepath=com/thetransactioncompany/cors-filter/1.8/cors-filter-1.8.jar dest=/tmp/cors-filter-1.8.jar
