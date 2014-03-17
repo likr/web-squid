@@ -111,29 +111,6 @@
       command: mkdir /var/lib/tomcat6/content/opendap/logs creates=/var/lib/tomcat6/content/opendap/logs
 
 
-    - name: install GrADS
-      yum: name=grads
-
-    - name: fetch GDS
-      get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
-      environment: proxy_env
-
-    - name: unarchive GDS
-      command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
-
-    - name: add gds.xml
-      copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
-
-    - name: add .bashrc
-      copy: src=.bashrc dest=~/.bashrc
-
-    - name: source .bashrc
-      command: source ~/.bashrc
-
-    - name: restart gds
-      command: /var/lib/gds-2.0/rebootserver
-
-
     #- name: fetch cors-filter
     #  get_url: url=http://search.maven.org/remotecontent?filepath=com/thetransactioncompany/cors-filter/1.8/cors-filter-1.8.jar dest=/tmp/cors-filter-1.8.jar
     #  environment: proxy_env
@@ -164,3 +141,26 @@
 
     # - name: restart bes
     #   command: besctl restart
+
+
+    - name: install GrADS
+      yum: name=grads
+
+    - name: fetch GDS
+      get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
+      environment: proxy_env
+
+    - name: unarchive GDS
+      command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
+
+    - name: add gds.xml
+      copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
+
+    - name: add server.xml
+      copy: src=server.xml dest=/var/lib/gds-2.0/tomcat4/conf/server.xml
+
+    - name: export GADDIR
+      shell: export GADDIR=/usr/share/grads/
+
+    - name: restart gds
+      command: /var/lib/gds-2.0/rebootserver
