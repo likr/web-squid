@@ -894,7 +894,7 @@ var squid;
                             var yi = d[1];
                             var hsi = 1;
                             SIs.forEach(function (SI) {
-                                hsi *= SI.SIFunction(dataCache[SI.date + SI.variable + SI.depth][0][0][0][0][yi][xi]);
+                                hsi *= SI.SIFunction(dataCache[SI.date + SI.variable.toLowerCase() + SI.depth][0][0][0][0][yi][xi]);
                             });
                             return hsi;
                         });
