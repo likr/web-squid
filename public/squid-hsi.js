@@ -228,8 +228,8 @@ var spline;
 /// <reference path="spline.ts"/>
 var squid;
 (function (squid) {
-    var svgWidth = 250;
-    var svgHeight = 250;
+    var svgWidth = 184;
+    var svgHeight = 184;
     var svgMargin = 20;
     var maxDepth = 25;
     var xScale = d3.scale.linear().domain([-1, 1]).range([svgMargin, svgWidth - svgMargin]).nice();
@@ -359,8 +359,8 @@ var squid;
 var squid;
 (function (squid) {
     var nInterval = 100;
-    var svgWidth = 250;
-    var svgHeight = 250;
+    var svgWidth = 184;
+    var svgHeight = 184;
     var svgMargin = 20;
 
     function drawGraph(selection, data, key, lambda) {
@@ -560,6 +560,8 @@ var squid;
             });
             $scope.lambda = 0.5;
             $scope.SIs = [];
+            $scope.minRowCount = 8;
+            $scope.SIPaddings = [0, 1, 2, 3, 4, 5, 6, 7];
             $scope.SIFunction = createCurrentSIFunction();
             $scope.depthMin = 0;
             $scope.depthMax = 25;
@@ -587,6 +589,9 @@ var squid;
                     SIFunction: $scope.SIFunction,
                     active: true
                 });
+                if ($scope.SIs.length <= $scope.minRowCount) {
+                    $scope.SIPaddings.pop();
+                }
             };
 
             $scope.incrementDepth = function () {
@@ -754,8 +759,12 @@ var squid;
 
     squid.app.controller('MapController', [
         '$scope', function ($scope) {
+            var lonS = 140;
+            var lonN = 149;
+            var latW = 36;
+            var latE = 43;
             var debugMode = false;
-            var xRange = { min: mercatrProjection.lonToX(140), max: mercatrProjection.lonToX(149) }, yRange = { min: mercatrProjection.latToY(36), max: mercatrProjection.latToY(43) }, width = xRange.max - xRange.min, height = yRange.max - yRange.min, aspectRatio = height / width;
+            var xRange = { min: mercatrProjection.lonToX(lonS), max: mercatrProjection.lonToX(lonN) }, yRange = { min: mercatrProjection.latToY(latW), max: mercatrProjection.latToY(latE) }, width = xRange.max - xRange.min, height = yRange.max - yRange.min, aspectRatio = height / width;
 
             // initialize renderer
             var stage = $('div#stage');
