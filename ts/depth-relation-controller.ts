@@ -2,8 +2,8 @@
 /// <reference path="spline.ts"/>
 
 module squid {
-var svgWidth = 250;
-var svgHeight = 250;
+var svgWidth = 184;
+var svgHeight = 184;
 var svgMargin = 20;
 var maxDepth = 25;
 var xScale = d3.scale.linear()

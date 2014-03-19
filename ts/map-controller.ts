@@ -100,9 +100,13 @@ function createMesh(values, xList, yList, f) {
 }
 
 app.controller('MapController', ['$scope', function($scope) {
+  var lonS = 140;
+  var lonN = 149;
+  var latW = 36;
+  var latE = 43;
   var debugMode = false;
-  var xRange = {min: mercatrProjection.lonToX(140), max: mercatrProjection.lonToX(149)},
-      yRange = {min: mercatrProjection.latToY(36), max: mercatrProjection.latToY(43)},
+  var xRange = {min: mercatrProjection.lonToX(lonS), max: mercatrProjection.lonToX(lonN)},
+      yRange = {min: mercatrProjection.latToY(latW), max: mercatrProjection.latToY(latE)},
       width = xRange.max - xRange.min,
       height = yRange.max - yRange.min,
       aspectRatio = height / width;

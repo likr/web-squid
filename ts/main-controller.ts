@@ -42,6 +42,8 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
   $scope.lambda = 0.5;
   $scope.SIs = [];
+  $scope.minRowCount = 8;
+  $scope.SIPaddings = [0, 1, 2, 3, 4, 5, 6, 7];
   $scope.SIFunction = createCurrentSIFunction();
   $scope.depthMin = 0;
   $scope.depthMax = 25;
@@ -69,6 +71,9 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
       SIFunction: $scope.SIFunction,
       active: true
     });
+    if ($scope.SIs.length <= $scope.minRowCount) {
+      $scope.SIPaddings.pop();
+    }
   };
 
   $scope.incrementDepth = () => {
