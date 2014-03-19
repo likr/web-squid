@@ -5,8 +5,8 @@
 
 module squid {
 var nInterval = 100;
-var svgWidth = 250;
-var svgHeight = 250;
+var svgWidth = 184;
+var svgHeight = 184;
 var svgMargin = 20;
 
 function drawGraph(selection, data, key, lambda) {

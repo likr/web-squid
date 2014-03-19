@@ -3,8 +3,14 @@
     proxy_env:
       http_proxy: http://proxy.kuins.net:8080
       https_proxy: http://proxy.kuins.net:8080
+    gds_env:
+      GADDIR: /usr/share/grads/
   sudo: yes
   tasks:
+    - name: install libselinux-python
+      yum: name=libselinux-python
+      environment: proxy_env
+
     #- name: fetch rpmforge rpm
     #  get_url: url=http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm dest=/tmp/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 
@@ -13,6 +19,7 @@
 
     #- name: install gdal
     #  yum: name=gdal state=present
+
     - name: fetch epel rpm
       get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-5-4.noarch.rpm
       environment: proxy_env
@@ -110,30 +117,6 @@
     - name: mkdir OLFS logs
       command: mkdir /var/lib/tomcat6/content/opendap/logs creates=/var/lib/tomcat6/content/opendap/logs
 
-
-    - name: install GrADS
-      yum: name=grads
-
-    - name: fetch GDS
-      get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
-      environment: proxy_env
-
-    - name: unarchive GDS
-      command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
-
-    - name: add gds.xml
-      copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
-
-    - name: add .bashrc
-      copy: src=.bashrc dest=~/.bashrc
-
-    - name: source .bashrc
-      command: source ~/.bashrc
-
-    - name: restart gds
-      command: /var/lib/gds-2.0/rebootserver
-
-
     #- name: fetch cors-filter
     #  get_url: url=http://search.maven.org/remotecontent?filepath=com/thetransactioncompany/cors-filter/1.8/cors-filter-1.8.jar dest=/tmp/cors-filter-1.8.jar
     #  environment: proxy_env
@@ -164,3 +147,23 @@
 
     # - name: restart bes
     #   command: besctl restart
+
+    - name: install GrADS
+      yum: name=grads
+      environment: proxy_env
+
+    - name: fetch GDS
+      get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
+      environment: proxy_env
+
+    - name: unarchive GDS
+      command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
+
+    - name: add gds.xml
+      copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
+
+    - name: add server.xml
+      copy: src=server.xml dest=/var/lib/gds-2.0/tomcat4/conf/server.xml
+
+    - name: restart gds
+      command: /var/lib/gds-2.0/rebootserver
