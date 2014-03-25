@@ -100,9 +100,9 @@ function createMesh(values, xList, yList, f) {
 }
 
 app.controller('MapController', ['$scope', function($scope) {
-  var lonS = 140;
-  var lonN = 149;
-  var latW = 36;
+  var lonS = 141;
+  var lonN = 147;
+  var latW = 35;
   var latE = 43;
   var debugMode = false;
   var xRange = {min: mercatrProjection.lonToX(lonS), max: mercatrProjection.lonToX(lonN)},
@@ -298,7 +298,7 @@ app.controller('MapController', ['$scope', function($scope) {
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][212:282][232:322]';
+      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });
