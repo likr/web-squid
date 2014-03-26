@@ -100,8 +100,8 @@ function createMesh(values, xList, yList, f) {
 }
 
 app.controller('MapController', ['$scope', function($scope) {
-  var lonS = 141;
-  var lonN = 147;
+  var lonS = 140;
+  var lonN = 148;
   var latW = 35;
   var latE = 43;
   var debugMode = false;
