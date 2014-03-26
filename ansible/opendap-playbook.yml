@@ -1,33 +1,42 @@
 - hosts: all
-  user: vagrant
   vars:
+    proxy_env:
+      http_proxy:
+      https_proxy:
     gds_env:
       GADDIR: /usr/share/grads/
   sudo: yes
   tasks:
+    # 1. java1.5 から 1.6にする
+    # 2. ansible/gds.xml のdatasetのfileのパスを書き換える。(デフォルトは/var/lib/gds-2.0/data/S etc)
+
+
+    # FIXME: 問題があれば80だけなど
+    - name: stop iptables
+      service: name=iptables state=stopped
+
+
     - name: fetch epel rpm
       get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-5-4.noarch.rpm
+      environment: proxy_env
 
     - name: install epel
       yum: name=/tmp/epel-release-5-4.noarch.rpm state=present
+      environment: proxy_env
 
     - name: install libselinux-python
       yum: name=libselinux-python
+      environment: proxy_env
 
     - name: install unzip
       yum: name=unzip
-
-
-    - name: remove java 1.5
-      yum: name=java state=removed
-
-    - name: install java 1.6
-      yum: name=java-1.6.0-openjdk-devel.x86_64 state=latest
+      environment: proxy_env
 
 
     # GDS
     - name: install GrADS
       yum: name=grads
+      environment: proxy_env
 
     - name: fetch GDS
       get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
@@ -44,16 +53,11 @@
     - name: add jetty-gds.xml
       copy: src=jetty-gds.xml dest=/var/lib/gds-2.0/jetty4/jetty-gds.xml
 
-    - name: add S
-      copy: src=S.zip dest=/tmp/S.zip
-
-    - name: unarchive S
-      command: unzip -o /tmp/S.zip -d /var/lib/gds-2.0
-
 
     # apache
     - name: install httpd
       yum: name=httpd state=present
+      environment: proxy_env
 
     - name: add proxy_ajp settings
       copy: src=proxy_ajp.conf dest=/etc/httpd/conf.d/proxy_ajp.conf
