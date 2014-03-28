@@ -659,6 +659,8 @@ var squid;
 /// <reference path="lib/jsdap.d.ts"/>
 var squid;
 (function (squid) {
+    var IGNORE_VALUE = -999000000;
+
     var mercatrProjection = (function () {
         var _r = 128 / Math.PI;
         var _lonToX = function (lon) {
@@ -714,7 +716,7 @@ var squid;
         // num to color
         var extents = values.map(function (row) {
             return d3.extent(row.filter(function (v) {
-                return v != 0;
+                return v != IGNORE_VALUE;
             }), f);
         });
         var min = d3.min(extents, function (d) {
@@ -726,7 +728,7 @@ var squid;
         var scale = d3.scale.linear().domain([min, max]).range([240, 0]);
         var _numTo16Color = function (num) {
             var v = f(num);
-            if (num == 0 || isNaN(v)) {
+            if (num == IGNORE_VALUE || isNaN(v)) {
                 return d3.hsl("hsl(100,100%,100%)").toString();
             }
             return d3.hsl("hsl(" + scale(v) + ",50%,50%)").toString();
@@ -760,8 +762,8 @@ var squid;
     squid.app.controller('MapController', [
         '$scope', function ($scope) {
             var lonS = 140;
-            var lonN = 149;
-            var latW = 36;
+            var lonN = 148;
+            var latW = 35;
             var latE = 43;
             var debugMode = false;
             var xRange = { min: mercatrProjection.lonToX(lonS), max: mercatrProjection.lonToX(lonN) }, yRange = { min: mercatrProjection.latToY(latW), max: mercatrProjection.latToY(latE) }, width = xRange.max - xRange.min, height = yRange.max - yRange.min, aspectRatio = height / width;
@@ -948,7 +950,7 @@ var squid;
                 if (dataCache[key]) {
                     drawData(dataCache[key]);
                 } else {
-                    var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/data/ocean/' + v + '.nc.dods?' + v + '[' + dateIndex + '][' + d + '][212:282][232:322]';
+                    var dataUrl = 'http://priusa.yes.jamstec.go.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
                     loadData(dataUrl, function (data) {
                         drawData(dataCache[key] = data);
                     });
