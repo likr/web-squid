@@ -4,6 +4,8 @@
 /// <reference path="lib/jsdap.d.ts"/>
 
 module squid {
+var IGNORE_VALUE = -999000000;
+
 var mercatrProjection = (function () {
   var _r = 128 / Math.PI;
   var _lonToX = function(lon) {
@@ -59,7 +61,7 @@ function createMesh(values, xList, yList, f) {
 
   // num to color
   var extents = values.map(row => {
-    return d3.extent(row.filter(v => v != 0), f);
+    return d3.extent(row.filter(v => v != IGNORE_VALUE), f);
   });
   var min = d3.min(extents, d => d[0]);
   var max = d3.max(extents, d => d[1]);
@@ -68,7 +70,7 @@ function createMesh(values, xList, yList, f) {
                 .range([240, 0]);
   var _numTo16Color = function (num) {
     var v = f(num);
-    if (num == 0 || isNaN(v)){
+    if (num == IGNORE_VALUE || isNaN(v)){
       return d3.hsl("hsl(100,100%,100%)").toString();
     }
     return d3.hsl("hsl("+scale(v)+",50%,50%)").toString();
@@ -298,7 +300,7 @@ app.controller('MapController', ['$scope', function($scope) {
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = 'http://opendap.viz.media.kyoto-u.ac.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
+      var dataUrl = 'http://priusa.yes.jamstec.go.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });
