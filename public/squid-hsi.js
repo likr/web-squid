@@ -728,9 +728,9 @@ var squid;
         var _numTo16Color = function (num) {
             var v = f(num);
             if (num == IGNORE_VALUE || isNaN(v)) {
-                return d3.hsl("hsl(100,100%,100%)").toString();
+                return d3.hsl(0, 1, 1).toString();
             }
-            return d3.hsl("hsl(" + scale(v) + ",50%,50%)").toString();
+            return d3.hsl(scale(v), 1, 0.5).toString();
         };
 
         for (var xi = 0, xLen = xList.length - 1; xi < xLen; xi++) {
@@ -826,7 +826,7 @@ var squid;
                         return p.cpue;
                     })).range([240, 360]);
                     var _numTo16Color = function (num) {
-                        return d3.hsl("hsl(" + scale(num) + ",100%,50%)").toString();
+                        return d3.hsl(scale(num), 1, 0.5).toString();
                     };
 
                     var colors = [];
