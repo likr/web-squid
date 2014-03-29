@@ -6,19 +6,18 @@ export function quincunx(u, v, w, q) {
   var n = u.length - 1;
   var i;
 
+  u[0] = 0;
+  v[0] = 0;
+  w[0] = 0;
   v[1] = v[1] / u[1];
   w[1] = w[1] / u[1];
-  u[2] = u[2] - u[1] * w[1] * w[1];
-  v[2] = (v[2] - u[1] * v[1] * w[1]) / u[2];
-  w[2] = w[2] / u[2];
-  for (i = 3; i < n; ++i) {
+  for (i = 2; i < n; ++i) {
     u[i] = u[i] - u[i - 2] * w[i - 2] * w[i - 2] - u[i - 1] * v[i - 1] * v[i - 1];
     v[i] = (v[i] - u[i - 1] * v[i - 1] * w[i - 1]) / u[i];
     w[i] = w[i] / u[i];
   }
 
-  q[2] = q[2] - v[1] * q[1];
-  for (i = 3; i < n; ++i) {
+  for (i = 2; i < n; ++i) {
     q[i] = q[i] - v[i - 1] * q[i - 1] - w[i - 2] * q[i - 2]
   }
   for (i = 1; i < n; ++i) {
@@ -52,11 +51,13 @@ export function smoothingSpline(x, y, sigma, lambda) {
     h[i] = x[i + 1] - x[i];
     r[i] = 3 / h[i];
   }
+  q[0] = 0;
   for (i = 1; i < n; ++i) {
     f[i] = -(r[i - 1] + r[i]);
     p[i] = 2 * (x[i + 1] - x[i - 1]);
     q[i] = 3 * (y[i + 1] - y[i]) / h[i] - 3 * (y[i] - y[i - 1]) / h[i - 1];
   }
+  q[n] = 0;
 
   for (i = 1; i < n; ++i) {
     u[i] = r[i - 1] * r[i - 1] * sigma[i - 1] + f[i] * f[i] * sigma[i] + r[i] * r[i] * sigma[i + 1];
@@ -77,8 +78,6 @@ export function smoothingSpline(x, y, sigma, lambda) {
   params[0][0] = q[1] / (3 * h[0]);
   params[0][1] = 0;
   params[0][2] = (params[1][3] - params[0][3]) / h[0] - q[1] * h[0] / 3;
-  q[0] = 0;
-  q[n] = 0;
   r[0] = 0;
   for (i = 1; i < n; ++i) {
     params[i][0] = (q[i + 1] - q[i]) / (3 * h[i]);
@@ -92,10 +91,10 @@ export function smoothingSpline(x, y, sigma, lambda) {
 
 
 export class SplineInterpolator {
-  private n : number;
+  n : number;
+  params : number[][];
   private x : number[];
   private y : number[];
-  private params : number[][];
 
   constructor(S, xAccessor, yAccessor, lambda) {
     var xy = S.map(d => [+xAccessor(d), +yAccessor(d)]);
