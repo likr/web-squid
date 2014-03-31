@@ -15,30 +15,30 @@ gds.xml with the file gds.xml.reference.
 
   <catalog temp_size_limit="0">
     <data>
-
-      <dataset name = "test"
-               file = "testdata/test.ctl"
-               das = "testdata/extra.das"
-               url = "http://www.iges.org/grads/gds/"
-	       format = "ctl">
-	       <!-- Note that carriage returns are treated by the XML parser
-		    as blanks, but newlines can be inserted by using character 10
-		    (&#10;) as shown below-->
-	       <metadata var="sst" name="extra_config_file_attribute"
-	        value="An attribute from the GDS configuration file.&#10;
-Attributes can contain multiple lines if needed."/>
+      <dataset name = "s"
+               file = "data/S/S3D_intpo.ctl"
+	             format = "ctl">
       </dataset>
-
-      <!-- specify public datasets here -->
-
-      <mapdir name="private">
-
-        <dataset name = "test_private" file = "testdata/test.ctl"/>
-
-        <!-- specify private datasets here -->
-
-      </mapdir>
-
+      <dataset name = "t"
+               file = "data/T/T3D_intpo.ctl"
+               format = "ctl">
+      </dataset>
+      <dataset name = "u"
+               file = "data/U/U3D_intpo.ctl"
+               format = "ctl">
+      </dataset>
+      <dataset name = "v"
+               file = "data/V/V3D_intpo.ctl"
+               format = "ctl">
+      </dataset>
+      <dataset name = "w"
+               file = "data/W/W3D_intpo.ctl"
+               format = "ctl">
+      </dataset>
+      <dataset name = "hm"
+               file = "data/HM/HM_intpo.ctl"
+               format = "ctl">
+      </dataset>
     </data>
   </catalog>
 
@@ -65,7 +65,7 @@ Attributes can contain multiple lines if needed."/>
 
   <mapper>
 
-    <service-admin enabled="false" auth="open-sesame" />
+    <service-admin enabled="true" auth="open-sesame" />
     <!-- edit this tag to enable the administration service -->
 
   </mapper>
@@ -73,14 +73,14 @@ Attributes can contain multiple lines if needed."/>
 
   <privilege_mgr default="public">
 
-    <ip_range mask="127.0.0.1" privilege="private" />
+    <!-- <ip_range mask="127.0.0.1" privilege="private" /> -->
 
     <privilege name="public">
     <!-- edit this tag to control public access -->
-      <deny path="private" />
+      <!-- <deny path="private" /> -->
     </privilege>
 
-    <privilege name="private" /> <!-- no deny tags, allows full access -->
+    <!-- <privilege name="private" /> no deny tags, allows full access -->
 
     <!-- specify more privilege sets and IP range assignments here -->
 
