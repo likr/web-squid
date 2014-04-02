@@ -2,5 +2,4 @@
 ts/depth-relation-controller.ts
 ts/distribution-controller.ts
 ts/si-controller.ts
-ts/main-controller.ts
 ts/map-controller.ts

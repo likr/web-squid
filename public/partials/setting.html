@@ -1,0 +1,40 @@
+<div class="modal-header">
+</div>
+<div class="modal-body">
+  <form class="form">
+    <div class="form-group">
+      <label>Prediction Target</label>
+      <input class="form-control" ui-date ng-model="settings.selectedDate"/>
+    </div>
+    <div class="form-group">
+      <label>CPUE From</label>
+      <input class="form-control" ui-date ng-model="settings.cpueDateFrom"/>
+    </div>
+    <div class="form-group">
+      <label>CPUE To</label>
+      <input class="form-control" ui-date ng-model="settings.cpueDateTo"/>
+    </div>
+    <div class="form-group">
+      <label>OPeNDAP Endpoint URL</label>
+      <input class="form-control" ng-model="settings.opendapEndpoint"/>
+    </div>
+    <div class="form-group">
+      <label>Latitude From</label>
+      <div>
+        <label class="radio-inline"><input class="radio" type="radio" ng-model="latFromDirection" value="N"/>N</label>
+        <label class="radio-inline"><input class="radio" type="radio" ng-model="latFromDirection" value="S"/>S</label>
+      </div>
+      <input class="form-control" type="number" min="0" max="90" ng-model="latFrom"/>
+    </div>
+    <div class="form-group">
+      <label>Latitude To</label>
+      <div>
+        <label class="radio-inline"><input class="radio" type="radio" ng-model="latToDirection" value="N"/>N</label>
+        <label class="radio-inline"><input class="radio" type="radio" ng-model="latToDirection" value="S"/>S</label>
+      </div>
+      <input class="form-control" type="number" min="0" max="90" ng-model="latTo"/>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+</div>

@@ -160,11 +160,11 @@ app.controller('MapController', ['$scope', function($scope) {
     if ($scope.showWholeCPUE || $scope.showExpectedCPUE) {
       var points = $scope.showWholeCPUE ? $scope.cpueVar : [];
       if ($scope.showExpectedCPUE) {
-        if (!$scope.showWholeCPUE || $scope.selectedDate < $scope.cpueDateFrom || $scope.cpueDateTo < $scope.selectedDate) {
+        if (!$scope.showWholeCPUE || $scope.settings.selectedDate < $scope.settings.cpueDateFrom || $scope.settings.cpueDateTo < $scope.settings.selectedDate) {
           points = points.concat($scope.originalCpueVar.filter(point => {
-            return point.date.getFullYear() == $scope.selectedDate.getFullYear()
-            && point.date.getMonth() == $scope.selectedDate.getMonth()
-            && point.date.getDate() == $scope.selectedDate.getDate();
+            return point.date.getFullYear() == $scope.settings.selectedDate.getFullYear()
+            && point.date.getMonth() == $scope.settings.selectedDate.getMonth()
+            && point.date.getDate() == $scope.settings.selectedDate.getDate();
           }));
         }
       }
@@ -286,7 +286,7 @@ app.controller('MapController', ['$scope', function($scope) {
     var v = $scope.selectedVariable.toLowerCase();
     var d = $scope.selectedDepth;
     var dateIndex = (() => {
-      var date = $scope.selectedDate;
+      var date = $scope.settings.selectedDate;
       var startDate : any = new Date(2006, 0, 10);
       var dateIndex = (date - startDate) / 86400000;
       if (dateIndex < 0) {
@@ -300,7 +300,7 @@ app.controller('MapController', ['$scope', function($scope) {
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = 'http://priusa.yes.jamstec.go.jp/opendap/' + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
+      var dataUrl = $scope.settings.opendapEndpoint + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });
@@ -327,7 +327,7 @@ app.controller('MapController', ['$scope', function($scope) {
     }
   });
 
-  $scope.$watch('selectedDate', (newValue, oldValue) => {
+  $scope.$watch('settings.selectedDate', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       draw();
     }

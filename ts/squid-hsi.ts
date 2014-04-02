@@ -1,9 +1,11 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
+/// <reference path="main-controller.ts"/>
+/// <reference path="setting-controller.ts"/>
 
 
 module squid {
-export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
+export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstrap'])
   .factory('d3get', ['$q', function($q) {
     return function(xhr) {
       var deferred = $q.defer();
@@ -39,6 +41,8 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date'])
       }
     }
   }])
+  .controller('MainController', MainController)
+  .controller('SettingController', SettingController)
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {

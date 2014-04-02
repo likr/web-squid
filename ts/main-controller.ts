@@ -28,7 +28,7 @@ function createSIFunction(cpueVar, selectedVariable, selectedDepth, lambda) {
 }
 
 
-app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar) {
+export function MainController($scope, cpueVar, $modal) {
   function createCurrentSIFunction() {
     return createSIFunction($scope.cpueVar, $scope.selectedVariable, $scope.selectedDepth, $scope.lambda);
   }
@@ -37,9 +37,10 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.cpueVar = cpueVar;
   $scope.selectedVariable = 'S';
   $scope.selectedDepth = 0;
-  $scope.selectedDate = new Date(2006, 0, 10);
-  $scope.cpueDateFrom = d3.min($scope.cpueVar, (d : any) => d.date);
-  $scope.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
+  $scope.settings = {};
+  $scope.settings.selectedDate = new Date(2006, 0, 10);
+  $scope.settings.cpueDateFrom = d3.min($scope.cpueVar, (d : any) => d.date);
+  $scope.settings.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
   $scope.lambda = 0.5;
   $scope.SIs = [];
   $scope.minRowCount = 8;
@@ -50,10 +51,11 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
   $scope.lambdaMin = 0.001;
   $scope.lambdaMax = 1;
   $scope.lambdaStep = 0.001;
+  $scope.settings.opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
 
   $scope.saveSI = () => {
     var dateIndex = (() => {
-      var date = $scope.selectedDate;
+      var date = $scope.settings.selectedDate;
       var startDate : any = new Date(2006, 0, 10);
       var dateIndex = (date - startDate) / 86400000;
       if (dateIndex < 0) {
@@ -110,10 +112,10 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
     }
   });
 
-  $scope.$watch('cpueDateFrom', (newValue, oldValue) => {
+  $scope.$watch('settings.cpueDateFrom', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       $scope.cpueVar = $scope.originalCpueVar.filter(d => {
-        return $scope.cpueDateFrom <= d.date && d.date <= +$scope.cpueDateTo + 86400000;
+        return $scope.settings.cpueDateFrom <= d.date && d.date <= +$scope.settings.cpueDateTo + 86400000;
       });
       $scope.SIFunction = createCurrentSIFunction();
       $scope.SIs.forEach(SI => {
@@ -122,10 +124,10 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
     }
   });
 
-  $scope.$watch('cpueDateTo', (newValue, oldValue) => {
+  $scope.$watch('settings.cpueDateTo', (newValue, oldValue) => {
     if (newValue !== oldValue) {
       $scope.cpueVar = $scope.originalCpueVar.filter(d => {
-        return $scope.cpueDateFrom <= d.date && d.date <= +$scope.cpueDateTo + 86400000;
+        return $scope.settings.cpueDateFrom <= d.date && d.date <= +$scope.settings.cpueDateTo + 86400000;
       });
       $scope.SIFunction = createCurrentSIFunction();
       $scope.SIs.forEach(SI => {
@@ -133,5 +135,16 @@ app.controller('MainController', ['$scope', 'cpueVar', function($scope, cpueVar)
       });
     }
   });
-}]);
+
+  $scope.openSetting = () => {
+    var modal = $modal.open({
+      templateUrl: 'partials/setting.html',
+      controller: 'SettingController',
+      scope: $scope,
+    });
+  };
+};
+
+
+(<any>MainController).$inject = ['$scope', 'cpueVar', '$modal'];
 }

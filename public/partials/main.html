@@ -25,22 +25,6 @@
   </div>
   <div class="col-xs-4" style="height:100%;">
     <div class="row">
-      <form class="form" style="border: solid; border-radius: 10px; border-width: 1px; border-color: #ddd; background-color: white; height: 100px;">
-        <div class="row" style="padding: 10px;">
-          <div class="form-group col-xs-4">
-            <label>MOVE Date</label>
-            <input class="form-control" ui-date ng-model="selectedDate"/>
-          </div>
-          <div class="form-group col-xs-4">
-            <label>CPUE From</label>
-            <input class="form-control" ui-date ng-model="cpueDateFrom"/>
-          </div>
-          <div class="form-group col-xs-4">
-            <label>CPUE To</label>
-            <input class="form-control" ui-date ng-model="cpueDateTo"/>
-          </div>
-        </div>
-      </form>
       <form class="form" style="border: solid; border-radius: 10px; border-width: 1px; border-color: #ddd; margin-top: 10px; background-color: white; height: 490px;">
         <div style="padding: 10px;">
           <div class="form-group">
@@ -93,6 +77,9 @@
           </div>
         </div>
       </form>
+      <div>
+        <button class="btn btn-default btn-lg" ng-click="openSetting()">Setting</button>
+      </div>
     </div>
   </div>
   <div class="col-xs-4" style="height:100%;">
