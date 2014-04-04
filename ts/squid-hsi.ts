@@ -2,6 +2,7 @@
 /// <reference path="typings/angularjs/angular.d.ts"/>
 /// <reference path="main-controller.ts"/>
 /// <reference path="setting-controller.ts"/>
+/// <reference path="data-manager.ts"/>
 
 
 module squid {
@@ -50,24 +51,7 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
         templateUrl: 'partials/main.html',
         resolve: {
           cpueVar: ['d3get', function(d3get) {
-            var id = 0;
-            return d3get(d3.csv('cpue-var.csv').row(d => {
-              var obj = {
-                id: id++,
-                x: +d.x,
-                y: +d.y,
-                date: new Date(d.stopDate),
-                cpue: +d.cpue,
-                HM0: +d.HM0,
-              };
-              ['S', 'T', 'U', 'V', 'W'].forEach(v => {
-                var i;
-                for (i = 0; i < 54; ++i) {
-                  obj[v + i] = +d[v + i];
-                }
-              });
-              return obj;
-            }));
+            return d3get(d3.csv('cpue-var.csv').row(parseRow));
           }]
         }
       })

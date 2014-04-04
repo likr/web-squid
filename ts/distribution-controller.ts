@@ -10,6 +10,7 @@ var svgHeight = 184;
 var svgMargin = 20;
 
 function drawGraph(selection, data, key, lambda) {
+  data = data.filter(d => d[key] != 0);
   var xs = (() => {
     var xs = new Array(nInterval);
     var extent  = d3.extent(data, (d => +d[key]));
@@ -48,6 +49,7 @@ function drawGraph(selection, data, key, lambda) {
     .y(d => yScale(interpolator.interpolate(d)))
     ;
   selection
+    .select('g.points')
     .selectAll('circle.data')
     .data(data, d => d.id)
     .call(selection => {
@@ -121,6 +123,10 @@ app.controller('DistributionController', ['$scope', function($scope) {
   var line = d3.svg.line()
     .x(d => d)
     .y(d => initialY)
+    ;
+  rootSelection
+    .append('g')
+    .classed('points', true)
     ;
   rootSelection
     .append('path')

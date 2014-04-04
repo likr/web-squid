@@ -10,12 +10,14 @@ function createSIFunction(cpueVar, selectedVariable, selectedDepth, lambda) {
     d => +d[key],
     d => +d['cpue'],
     lambda);
-  var maxVal = interpolator.max()
+  var scale = d3.scale.linear()
+    .domain([interpolator.min(), interpolator.max()])
+    .range([0, 1]);
   return x => {
     if (x == 0) {
       return NaN;
     } else {
-      var v = interpolator.interpolate(x) / maxVal;
+      var v = scale(interpolator.interpolate(x));
       if (v > 1) {
         return 1;
       } else if (v < 0) {
@@ -139,7 +141,6 @@ export function MainController($scope, cpueVar, $modal) {
   $scope.openSetting = () => {
     var modal = $modal.open({
       templateUrl: 'partials/setting.html',
-      controller: 'SettingController',
       scope: $scope,
     });
   };

@@ -38,13 +38,14 @@ function drawGraph(selection, data, variable, lambda) {
     var depth;
     for (depth = 0; depth <= maxDepth; ++depth) {
       var key = variable + depth;
+      var dat = data.filter(d => d[key] != 0);
       var interpolator = spline.interpolator(
-          data,
+          dat,
           d => +d[key],
           d => +d['cpue'],
           lambda);
-      var y = data.map(d => +d['cpue']);
-      var yPrime = data.map(d => interpolator.interpolate(+d[key]));
+      var y = dat.map(d => +d['cpue']);
+      var yPrime = dat.map(d => interpolator.interpolate(+d[key]));
       Rs.push([depth, spline.correlation(y, yPrime)]);
     }
     return Rs;

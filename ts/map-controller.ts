@@ -102,10 +102,10 @@ function createMesh(values, xList, yList, f) {
 }
 
 app.controller('MapController', ['$scope', function($scope) {
-  var lonS = 140;
-  var lonN = 148;
-  var latW = 35;
-  var latE = 43;
+  var lonS = 169;
+  var lonN = 182;
+  var latW = 34;
+  var latE = 46;
   var debugMode = false;
   var xRange = {min: mercatrProjection.lonToX(lonS), max: mercatrProjection.lonToX(lonN)},
       yRange = {min: mercatrProjection.latToY(latW), max: mercatrProjection.latToY(latE)},
@@ -170,7 +170,7 @@ app.controller('MapController', ['$scope', function($scope) {
       }
       var geometry = new THREE.Geometry();
       var material = new THREE.ParticleSystemMaterial({
-        size: 5,
+        size: 2,
         sizeAttenuation: false,
         vertexColors: true
       });
@@ -259,7 +259,12 @@ app.controller('MapController', ['$scope', function($scope) {
           var yi = d[1];
           var hsi = 1;
           SIs.forEach(SI => {
-            hsi *= SI.SIFunction(dataCache[SI.date + SI.variable.toLowerCase() + SI.depth][0][0][0][0][yi][xi])
+            var v = dataCache[SI.date + SI.variable.toLowerCase() + SI.depth][0][0][0][0][yi][xi];
+            if (v == IGNORE_VALUE) {
+              hsi = NaN;
+            } else {
+              hsi *= SI.SIFunction(v)
+            }
           });
           return hsi;
         });
@@ -300,7 +305,9 @@ app.controller('MapController', ['$scope', function($scope) {
     if (dataCache[key]) {
        drawData(dataCache[key]);
     } else {
-      var dataUrl = $scope.settings.opendapEndpoint + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][202:282][242:302]';
+      var lat = 192 + ':' + 312;
+      var lon = 497 + ':' + 551;
+      var dataUrl = $scope.settings.opendapEndpoint + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
       });

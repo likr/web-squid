@@ -100,17 +100,24 @@ export class SplineInterpolator {
     var xy = S.map(d => [+xAccessor(d), +yAccessor(d)]);
     xy.sort((d1, d2) => d1[0] - d2[0]);
     var x0 = undefined;
-    xy = xy.filter(d => {
-      var x00 = x0;
-      x0 = d[0];
-      return x00 != x0;
-    });
-    var sigma = xy.map(function() {
+    var i, n = xy.length, x, sum, count;
+    var xy2 : number[][] = [];
+    for (i = 0, sum = 0, count = 0, x = xy[0][0]; i < n; ++i, ++count) {
+      if (xy[i][0] != x) {
+        xy2.push([x, sum / count]);
+        x = xy[i][0];
+        count = 0;
+        sum = 0;
+      }
+      sum += xy[i][1];
+    }
+    xy2.push([x, sum / count]);
+    var sigma = xy2.map(function() {
       return 1;
     });
-    this.n = xy.length - 1;
-    this.x = xy.map(d => d[0]);
-    this.y = xy.map(d => d[1]);
+    this.n = xy2.length - 1;
+    this.x = xy2.map(d => d[0]);
+    this.y = xy2.map(d => d[1]);
     this.params = smoothingSpline(this.x, this.y, sigma, lambda);
   }
 
@@ -131,7 +138,35 @@ export class SplineInterpolator {
   }
 
   max() : number {
-    return d3.max(this.y);
+    var step = 100;
+    var xStart = this.x[0];
+    var xStop = this.x[this.n];
+    var delta = (xStop - xStart) / step;
+    var maxValue = -Infinity;
+    var i, x, y;
+    for (i = 0, x = xStart; i < step; ++i, x += delta) {
+      y = this.interpolate(x);
+      if (y > maxValue) {
+        maxValue = y;
+      }
+    }
+    return maxValue;
+  }
+
+  min() : number {
+    var step = 100;
+    var xStart = this.x[0];
+    var xStop = this.x[this.n];
+    var delta = (xStop - xStart) / step;
+    var minValue = Infinity;
+    var i, x, y;
+    for (i = 0, x = xStart; i < step; ++i, x += delta) {
+      y = this.interpolate(x);
+      if (y < minValue) {
+        minValue = y;
+      }
+    }
+    return minValue;
   }
 }
 
