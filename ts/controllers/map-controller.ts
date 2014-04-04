@@ -1,7 +1,7 @@
-/// <reference path="squid-hsi.ts"/>
-/// <reference path="typings/jquery/jquery.d.ts"/>
-/// <reference path="typings/threejs/three.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
+/// <reference path="../typings/d3/d3.d.ts"/>
+/// <reference path="../typings/jquery/jquery.d.ts"/>
+/// <reference path="../typings/threejs/three.d.ts"/>
+/// <reference path="../lib/jsdap.d.ts"/>
 
 module squid {
 var IGNORE_VALUE = -999000000;
@@ -101,7 +101,7 @@ function createMesh(values, xList, yList, f) {
   return new THREE.Mesh(geo, material);
 }
 
-app.controller('MapController', ['$scope', function($scope) {
+export var MapController = ['$scope', function($scope) {
   var lonS = 169;
   var lonN = 182;
   var latW = 34;
@@ -399,5 +399,5 @@ app.controller('MapController', ['$scope', function($scope) {
   drawCoastLine();
   markPoints();
   draw();
-}]);
+}];
 }

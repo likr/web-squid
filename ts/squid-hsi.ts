@@ -1,7 +1,11 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
-/// <reference path="main-controller.ts"/>
-/// <reference path="setting-controller.ts"/>
+/// <reference path="controllers/depth-relation-controller.ts"/>
+/// <reference path="controllers/distribution-controller.ts"/>
+/// <reference path="controllers/setting-controller.ts"/>
+/// <reference path="controllers/si-controller.ts"/>
+/// <reference path="controllers/main-controller.ts"/>
+/// <reference path="controllers/map-controller.ts"/>
 /// <reference path="data-manager.ts"/>
 
 
@@ -43,7 +47,11 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
     }
   }])
   .controller('MainController', MainController)
+  .controller('MapController', MapController)
   .controller('SettingController', SettingController)
+  .controller('SIController', SIController)
+  .controller('DepthRelationController', DepthRelationController)
+  .controller('DistributionController', DistributionController)
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {

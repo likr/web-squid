@@ -1,5 +1,4 @@
-/// <reference path="squid-hsi.ts"/>
-/// <reference path="spline.ts"/>
+/// <reference path="../spline.ts"/>
 
 module squid {
 var svgWidth = 184;
@@ -75,7 +74,7 @@ function changeActivePoint(selection, selectedDepth) {
 }
 
 
-app.controller('DepthRelationController', ['$scope', function($scope) {
+export var DepthRelationController = ['$scope', function($scope) {
   var cpueVar = $scope.cpueVar
 
   var Rs = (() => {
@@ -165,5 +164,5 @@ app.controller('DepthRelationController', ['$scope', function($scope) {
 
   drawGraph(rootSelection, cpueVar, $scope.selectedVariable, $scope.lambda);
   changeActivePoint(rootSelection, $scope.selectedDepth);
-}]);
+}];
 }

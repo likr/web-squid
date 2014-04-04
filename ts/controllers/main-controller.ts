@@ -1,5 +1,4 @@
-/// <reference path="squid-hsi.ts"/>
-/// <reference path="spline.ts"/>
+/// <reference path="../spline.ts"/>
 
 
 module squid {

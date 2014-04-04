@@ -1,6 +1,5 @@
-/// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="squid-hsi.ts"/>
-/// <reference path="spline.ts"/>
+/// <reference path="../typings/d3/d3.d.ts"/>
+/// <reference path="../spline.ts"/>
 
 
 module squid {
@@ -90,7 +89,7 @@ function drawGraph(selection, data, key, lambda) {
 }
 
 
-app.controller('DistributionController', ['$scope', function($scope) {
+export var DistributionController = ['$scope', function($scope) {
   var cpueVar = $scope.cpueVar;
   var initialY = svgHeight / 2;
   var xs = (() => {
@@ -179,5 +178,5 @@ app.controller('DistributionController', ['$scope', function($scope) {
   });
 
   draw();
-}]);
+}];
 }

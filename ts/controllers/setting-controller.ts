@@ -1,5 +1,5 @@
-/// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="data-manager.ts"/>
+/// <reference path="../typings/d3/d3.d.ts"/>
+/// <reference path="../data-manager.ts"/>
 
 module squid {
 export class SettingController {
