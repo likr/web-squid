@@ -6,7 +6,9 @@
 /// <reference path="controllers/si-controller.ts"/>
 /// <reference path="controllers/main-controller.ts"/>
 /// <reference path="controllers/map-controller.ts"/>
+/// <reference path="views/map-view.ts"/>
 /// <reference path="data-manager.ts"/>
+/// <reference path="si-manager.ts"/>
 
 
 module squid {
@@ -46,6 +48,9 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
       }
     }
   }])
+  .service('DataManager', DataManager)
+  .service('SIManager', SIManager)
+  .service('MapView', MapView)
   .controller('MainController', MainController)
   .controller('MapController', MapController)
   .controller('SettingController', SettingController)
