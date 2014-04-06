@@ -290,17 +290,7 @@ export var MapController = ['$scope', function($scope) {
   function draw () {
     var v = $scope.selectedVariable.toLowerCase();
     var d = $scope.selectedDepth;
-    var dateIndex = (() => {
-      var date = $scope.settings.selectedDate;
-      var startDate : any = new Date(2006, 0, 10);
-      var dateIndex = (date - startDate) / 86400000;
-      if (dateIndex < 0) {
-        return 0;
-      } else if (dateIndex > 9) {
-        return 9;
-      }
-      return dateIndex;
-    })();
+    var dateIndex = $scope.getDateIndex($scope.settings.selectedDate);
     var key = dateIndex + v + d;
     if (dataCache[key]) {
        drawData(dataCache[key]);

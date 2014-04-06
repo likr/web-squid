@@ -29,9 +29,15 @@ function createSIFunction(cpueVar, selectedVariable, selectedDepth, lambda) {
 }
 
 
-export function MainController($scope, cpueVar, $modal) {
+export function MainController($scope, cpueVar, $modal, dateSteps) {
   function createCurrentSIFunction() {
     return createSIFunction($scope.cpueVar, $scope.selectedVariable, $scope.selectedDepth, $scope.lambda);
+  }
+
+  $scope.getDateIndex = function getDateIndex(date) {
+    var baseDate : any = new Date(1970, 0, 1);
+    var x = Math.floor((date - baseDate) / 86400000) + 719164;
+    return Math.min(d3.bisectLeft(dateSteps, x), dateSteps.length - 1);
   }
 
   $scope.originalCpueVar = cpueVar;
@@ -55,17 +61,7 @@ export function MainController($scope, cpueVar, $modal) {
   $scope.settings.opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
 
   $scope.saveSI = () => {
-    var dateIndex = (() => {
-      var date = $scope.settings.selectedDate;
-      var startDate : any = new Date(2006, 0, 10);
-      var dateIndex = (date - startDate) / 86400000;
-      if (dateIndex < 0) {
-        return 0;
-      } else if (dateIndex > 9) {
-        return 9;
-      }
-      return dateIndex;
-    })();
+    var dateIndex = $scope.getDateIndex($scope.settings.selectedDate);
     $scope.SIs.push({
       variable: $scope.selectedVariable,
       depth: $scope.selectedDepth,
@@ -146,5 +142,5 @@ export function MainController($scope, cpueVar, $modal) {
 };
 
 
-(<any>MainController).$inject = ['$scope', 'cpueVar', '$modal'];
+(<any>MainController).$inject = ['$scope', 'cpueVar', '$modal', 'dateSteps'];
 }
