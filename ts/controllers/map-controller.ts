@@ -102,8 +102,8 @@ function createMesh(values, xList, yList, f) {
 }
 
 export var MapController = ['$scope', function($scope) {
-  var lonS = 169;
-  var lonN = 182;
+  var lonS = 178;
+  var lonN = 191;
   var latW = 34;
   var latE = 46;
   var debugMode = false;
@@ -296,7 +296,7 @@ export var MapController = ['$scope', function($scope) {
        drawData(dataCache[key]);
     } else {
       var lat = 192 + ':' + 312;
-      var lon = 497 + ':' + 551;
+      var lon = 551 + ':' + 605;
       var dataUrl = $scope.settings.opendapEndpoint + v + '.dods?' + v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
       loadData(dataUrl, function(data) {
         drawData(dataCache[key] = data);
@@ -305,8 +305,8 @@ export var MapController = ['$scope', function($scope) {
   }
 
   $scope.view = 'variable';
-  $scope.showWholeCPUE = true;
-  $scope.showExpectedCPUE = false;
+  $scope.showWholeCPUE = false;
+  $scope.showExpectedCPUE = true;
 
   $scope.$watch('selectedVariable', (newValue, oldValue) => {
     if (newValue !== oldValue) {

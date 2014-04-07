@@ -45,7 +45,7 @@ export function MainController($scope, cpueVar, $modal, dateSteps) {
   $scope.selectedVariable = 'S';
   $scope.selectedDepth = 0;
   $scope.settings = {};
-  $scope.settings.selectedDate = new Date(2006, 0, 10);
+  $scope.settings.selectedDate = new Date(2012, 6, 1);
   $scope.settings.cpueDateFrom = d3.min($scope.cpueVar, (d : any) => d.date);
   $scope.settings.cpueDateTo = d3.max($scope.cpueVar, (d : any) => d.date);
   $scope.lambda = 0.5;

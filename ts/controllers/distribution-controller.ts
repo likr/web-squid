@@ -57,6 +57,7 @@ function drawGraph(selection, data, key, lambda) {
         .classed('data', true)
         .attr({
           fill: 'black',
+          opacity: 0.3,
           r: 1,
           cx: 0,
           cy: d => yScale(d.cpue)
