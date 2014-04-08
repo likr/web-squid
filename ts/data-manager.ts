@@ -5,7 +5,7 @@ export function parseRow(d) {
     id: id++,
     x: +d.LON,
     y: +d.LAT,
-    date: new Date(d.YEAR, d.MONTH, d.DAY),
+    date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
     cpue: +d.CPUE,
     HM0: +d.HM0,
   };

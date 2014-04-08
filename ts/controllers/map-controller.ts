@@ -170,7 +170,7 @@ export var MapController = ['$scope', function($scope) {
       }
       var geometry = new THREE.Geometry();
       var material = new THREE.ParticleSystemMaterial({
-        size: 2,
+        size: 5,
         sizeAttenuation: false,
         vertexColors: true
       });
@@ -328,6 +328,7 @@ export var MapController = ['$scope', function($scope) {
     if (newValue !== oldValue) {
       draw();
     }
+    markPoints();
   });
 
   $scope.$watch('lambda', (newValue, oldValue) => {
