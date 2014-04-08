@@ -10,7 +10,7 @@ export function parseRow(d) {
     id: id++,
     x: +d.LON,
     y: +d.LAT,
-    date: new Date(d.YEAR, d.MONTH, d.DAY),
+    date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
     cpue: +d.CPUE,
     HM0: +d.HM0,
   };
@@ -34,8 +34,8 @@ export class DataManager {
   public latStart = 192;
   public latStop = 312;
   public latLength = this.latStop - this.latStart;
-  public lonStart = 497;
-  public lonStop = 551;
+  public lonStart = 551;
+  public lonStop = 605;
   public lonLength = this.lonStop - this.lonStart;
   private CPUEPoints : any[];
   private dataCache;

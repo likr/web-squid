@@ -31,8 +31,8 @@ export class MapView {
   private yStop : number;
 
   constructor(private $q, private parameters : DataManager, private SIManager) {
-    var lonS = 169;
-    var lonN = 182;
+    var lonS = 178;
+    var lonN = 191;
     var latW = 34;
     var latE = 46;
     var debugMode = false;
@@ -249,7 +249,7 @@ export class MapView {
       var points = this.parameters.getExpectedCPUE();
       var geometry = new THREE.Geometry();
       var material = new THREE.ParticleSystemMaterial({
-        size: 2,
+        size: 5,
         sizeAttenuation: false,
         vertexColors: true
       });

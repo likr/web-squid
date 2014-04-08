@@ -1,5 +1,6 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
+/// <reference path="lib/jsdap.d.ts"/>
 /// <reference path="controllers/depth-relation-controller.ts"/>
 /// <reference path="controllers/distribution-controller.ts"/>
 /// <reference path="controllers/setting-controller.ts"/>
@@ -25,6 +26,24 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
         })
         .get()
         ;
+      return deferred.promise;
+    };
+  }])
+  .factory('loadDataset', ['$q', function($q) {
+    return function(url) {
+      var deferred = $q.defer();
+      loadDataset(url, function(result) {
+        deferred.resolve(result);
+      });
+      return deferred.promise;
+    };
+  }])
+  .factory('loadData', ['$q', function($q) {
+    return function(url) {
+      var deferred = $q.defer();
+      loadData(url, function(result) {
+        deferred.resolve(result);
+      });
       return deferred.promise;
     };
   }])
@@ -65,7 +84,19 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
         resolve: {
           cpueVar: ['d3get', function(d3get) {
             return d3get(d3.csv('cpue-var.csv').row(parseRow));
-          }]
+          }],
+          dateSteps: ['loadDataset', 'loadData', function(loadDataset, loadData) {
+            return loadDataset('http://priusa.yes.jamstec.go.jp/opendap/s')
+              .then(dataset => {
+                return dataset.time.shape[0];
+              })
+              .then(size => {
+                return loadData('http://priusa.yes.jamstec.go.jp/opendap/s.dods?s[0:' + (size - 1) + '][0][0][0]');
+              })
+              .then(data => {
+                return data[0][1];
+              });
+          }],
         }
       })
       ;

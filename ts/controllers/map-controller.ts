@@ -5,7 +5,6 @@ export class MapController {
   static $inject = ['$scope', 'MapView'];
 
   constructor($scope, MapView) {
-
     $scope.view = 'variable';
     $scope.showWholeCPUE = true;
     $scope.showExpectedCPUE = false;
@@ -30,6 +29,7 @@ export class MapController {
       if (newValue !== oldValue) {
         MapView.draw();
       }
+      //markPoints();
     });
 
     $scope.$watch('lambda', (newValue, oldValue) => {
