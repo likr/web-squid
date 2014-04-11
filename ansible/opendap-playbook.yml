@@ -3,6 +3,7 @@
     proxy_env:
       http_proxy:
       https_proxy:
+      ftp_proxy:
     gds_env:
       GADDIR: /usr/share/grads/
   sudo: yes
@@ -40,6 +41,7 @@
 
     - name: fetch GDS
       get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
+      environment: proxy_env
 
     - name: unarchive GDS
       command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
