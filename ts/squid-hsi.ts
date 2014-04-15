@@ -13,7 +13,7 @@
 
 
 module squid {
-export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstrap'])
+export var app = angular.module('squid-hsi', ['ui.router', 'ui.date', 'ui.bootstrap'])
   .factory('d3get', ['$q', function($q) {
     return function(xhr) {
       var deferred = $q.defer();
@@ -29,24 +29,7 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
       return deferred.promise;
     };
   }])
-  .factory('loadDataset', ['$q', function($q) {
-    return function(url) {
-      var deferred = $q.defer();
-      loadDataset(url, function(result) {
-        deferred.resolve(result);
-      });
-      return deferred.promise;
-    };
-  }])
-  .factory('loadData', ['$q', function($q) {
-    return function(url) {
-      var deferred = $q.defer();
-      loadData(url, function(result) {
-        deferred.resolve(result);
-      });
-      return deferred.promise;
-    };
-  }])
+  .factory('MapRenderer', MapRendererFactory)
   .filter('variableName', [() => {
     return (variable : string) : string => {
       switch (variable) {
@@ -69,37 +52,38 @@ export var app = angular.module('squid-hsi', ['ngRoute', 'ui.date', 'ui.bootstra
   }])
   .service('DataManager', DataManager)
   .service('SIManager', SIManager)
-  .service('MapView', MapView)
   .controller('MainController', MainController)
   .controller('MapController', MapController)
   .controller('SettingController', SettingController)
   .controller('SIController', SIController)
   .controller('DepthRelationController', DepthRelationController)
   .controller('DistributionController', DistributionController)
-  .config(['$routeProvider', function($routeProvider) {
-    $routeProvider
-      .when('/', {
+  .config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
+    $stateProvider
+      .state('setting', {
+        controller: 'SettingController as settings',
+        templateUrl: 'partials/setting.html',
+        url: '/setting',
+      })
+      .state('main', {
         controller: 'MainController',
         templateUrl: 'partials/main.html',
-        resolve: {
-          cpueVar: ['d3get', function(d3get) {
-            return d3get(d3.csv('cpue-var.csv').row(parseRow));
-          }],
-          dateSteps: ['loadDataset', 'loadData', function(loadDataset, loadData) {
-            return loadDataset('http://priusa.yes.jamstec.go.jp/opendap/s')
-              .then(dataset => {
-                return dataset.time.shape[0];
-              })
-              .then(size => {
-                return loadData('http://priusa.yes.jamstec.go.jp/opendap/s.dods?s[0:' + (size - 1) + '][0][0][0]');
-              })
-              .then(data => {
-                return data[0][1];
-              });
-          }],
-        }
+        url: '/main',
       })
       ;
+    $urlRouterProvider
+      .otherwise('/setting');
+  }])
+  .run(['$rootScope', $rootScope => {
+    $rootScope.alerts = [];
+
+    $rootScope.addAlert = a => {
+      $rootScope.alerts.push(a);
+    };
+
+    $rootScope.closeAlert = i => {
+      $rootScope.alerts.splice(i, 1);
+    };
   }])
   ;
 }

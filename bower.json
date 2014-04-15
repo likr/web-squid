@@ -21,6 +21,7 @@
     "angular": "~1.2.13",
     "d3": "~3.4.2",
     "threejs": "*",
-    "angular-ui-date": "~0.0.3"
+    "angular-ui-date": "~0.0.3",
+    "angular-ui-router": "~0.2.10"
   }
 }

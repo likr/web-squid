@@ -1,14 +1,10 @@
+/// <reference path="../views/map-view.ts"/>
+
 module squid {
-
-
 export class MapController {
   static $inject = ['$scope', 'MapView'];
 
   constructor($scope, MapView) {
-    $scope.view = 'variable';
-    $scope.showWholeCPUE = true;
-    $scope.showExpectedCPUE = false;
-
     $scope.$watch('selectedVariable', (newValue, oldValue) => {
       if (newValue !== oldValue) {
         if ($scope.view != 'hsi') {

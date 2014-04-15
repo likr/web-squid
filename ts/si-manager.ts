@@ -36,11 +36,18 @@ export class SI {
 
 
 export class SIManager {
-  static $inject = [];
+  static $inject = ['DataManager'];
   public SIs : SI[] = [];
-  public currentSI : SI;
 
-  constructor() {
+  constructor(private DataManager) {
+  }
+
+  createSI(variableName : string, depthIndex : number, lambda : number) {
+    return new SI(this.DataManager.CPUEPoints, variableName, depthIndex, lambda);
+  }
+
+  registerSI(SI) {
+    this.SIs.push(SI);
   }
 }
 }
