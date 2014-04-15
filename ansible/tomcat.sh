@@ -54,6 +54,4 @@ PROPS="-Djava.io.tmpdir=$ANAGRAM_TEMP \
 -Dcatalina.home=$CATALINA_HOME \
 -Dcatalina.base=$CATALINA_BASE"
 
-JAVA_OPTS="$JAVA_OPTS $CP $PROPS"
-
-export $JAVA_OPTS
+export JAVA_OPTS="$JAVA_OPTS $CP $PROPS"
