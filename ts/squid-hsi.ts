@@ -1,12 +1,10 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
 /// <reference path="lib/jsdap.d.ts"/>
-/// <reference path="controllers/depth-relation-controller.ts"/>
-/// <reference path="controllers/distribution-controller.ts"/>
-/// <reference path="controllers/setting-controller.ts"/>
-/// <reference path="controllers/si-controller.ts"/>
 /// <reference path="controllers/main-controller.ts"/>
-/// <reference path="controllers/map-controller.ts"/>
+/// <reference path="controllers/setting-controller.ts"/>
+/// <reference path="views/correlation-view.ts"/>
+/// <reference path="views/distribution-view.ts"/>
 /// <reference path="views/map-view.ts"/>
 /// <reference path="data-manager.ts"/>
 /// <reference path="si-manager.ts"/>
@@ -29,6 +27,8 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.date', 'ui.bootst
       return deferred.promise;
     };
   }])
+  .factory('CorrelationRenderer', CorrelationRendererFactory)
+  .factory('DistributionRenderer', DistributionRendererFactory)
   .factory('MapRenderer', MapRendererFactory)
   .filter('variableName', [() => {
     return (variable : string) : string => {
@@ -53,11 +53,7 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.date', 'ui.bootst
   .service('DataManager', DataManager)
   .service('SIManager', SIManager)
   .controller('MainController', MainController)
-  .controller('MapController', MapController)
   .controller('SettingController', SettingController)
-  .controller('SIController', SIController)
-  .controller('DepthRelationController', DepthRelationController)
-  .controller('DistributionController', DistributionController)
   .config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
     $stateProvider
       .state('setting', {

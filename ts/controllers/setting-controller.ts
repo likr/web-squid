@@ -29,28 +29,30 @@ export class SettingController {
     }
     var reader = new FileReader();
     reader.onload = e => {
+      var id = 0;
       var data = d3.csv.parse(e.target.result).map(d => {
-        var id = 0;
         var obj = {
           id: id++,
           x: +d.LON,
           y: +d.LAT,
           date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
           cpue: +d.CPUE,
-          HM0: +d.HM,
-          HMg0: +d.HMg,
+          hm0: +d.HM,
+          hmg0: +d.HMg,
         };
         ['S', 'T', 'U', 'V', 'W'].forEach(v => {
           var i;
           for (i = 0; i < 54; ++i) {
             var val = +d[v + ('0' + (i + 1)).slice(-2)]
-            obj[v + i] = val == -999 ? 0 : val;
+            obj[v.toLowerCase() + i] = val == -999 ? 0 : val;
           }
         });
         return obj;
       });
       this.DataManager.CPUEPoints = data;
       this.DataManager.selectedDate = this.predictionDate;
+      this.DataManager.cpueDateFrom = this.cpueFrom;
+      this.DataManager.cpueDateTo = this.cpueTo;
       this.DataManager.opendapEndpoint = this.opendapEndpoint;
       this.DataManager
         .initialize(data, this.opendapEndpoint)

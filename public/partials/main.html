@@ -1,27 +1,24 @@
 <tabset justified="true">
   <tab heading="SI" select="drawSIViews()">
     <div class="row">
-      <div class="col-xs-4">
-        <label>SI Map</label>
+      <div class="col-xs-4 col-xs-offset-1">
+        <h2>SI Map</h2>
         <div id="si-map"></div>
-        <label>Variable Distribution</label>
+        <h2>Variable Distribution</h2>
         <div id="variable-map"></div>
       </div>
-      <div class="col-xs-4">
+      <div class="col-xs-3">
+        <h2>Collelation Graph</h2>
         <div id="correlation-graph"></div>
+        <h2>Scatter Plot Graph</h2>
         <div id="scatter-plot-graph"></div>
       </div>
-      <div class="col-xs-4">
+      <div class="col-xs-3">
+        <h2>SI Parameters</h2>
         <form class="form">
             <div class="form-group">
               <label>Variables</label>
-              <select class="form-control">
-                <option>{{'S' | variableName}}</option>
-                <option>{{'T' | variableName}}</option>
-                <option>{{'HM' | variableName}}</option>
-                <option>{{'U' | variableName}}</option>
-                <option>{{'V' | variableName}}</option>
-                <option>{{'W' | variableName}}</option>
+              <select class="form-control" ng-model="currentSI.variableName" ng-options="v.value as v.name for v in variables">
               </select>
             </div>
             <div class="form-group">

@@ -6,16 +6,35 @@ export class SI {
   private interpolator;
   private scale;
 
-  constructor(CPUEs, public variableName, public depthIndex, public lambda) {
-    var key = variableName + depthIndex;
-    this.interpolator = spline.interpolator(
-        CPUEs,
-        d => d[key],
-        d => d.cpue,
-        lambda);
-    this.scale = d3.scale.linear()
-      .domain([this.interpolator.min(), this.interpolator.max()])
-      .range([0, 1]);
+  constructor(private CPUEs, private variableName_ : string, private depthIndex_ : number, private lambda_ : number) {
+    this.interpolate();
+  }
+
+  get variableName() : string {
+    return this.variableName_;
+  }
+
+  set variableName(value : string) {
+    this.variableName_ = value;
+    this.interpolate();
+  }
+
+  get depthIndex() : number {
+    return this.depthIndex_;
+  }
+
+  set depthIndex(value : number) {
+    this.depthIndex_ = value;
+    this.interpolate();
+  }
+
+  get lambda() : number {
+    return this.lambda_;
+  }
+
+  set lambda(value : number) {
+    this.lambda_ = value;
+    this.interpolate();
   }
 
   call(x : number) : number {
@@ -31,6 +50,18 @@ export class SI {
         return v;
       }
     }
+  }
+
+  private interpolate() {
+    var key = this.variableName_ + this.depthIndex_;
+    this.interpolator = spline.interpolator(
+        this.CPUEs,
+        d => d[key],
+        d => d.cpue,
+        this.lambda_);
+    this.scale = d3.scale.linear()
+      .domain([this.interpolator.min(), this.interpolator.max()])
+      .range([0, 1]);
   }
 }
 
