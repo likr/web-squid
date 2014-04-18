@@ -111,9 +111,15 @@ export function MainController(
   $scope.drawSIViews = () => {
     if (!initialized) {
       variableMapRenderer = new MapRenderer('#variable-map');
+      variableMapRenderer.setSize(
+          $('.col-xs-4').width() - 5, // XXX
+          $('.col-xs-3').width());
       variableMapRenderer.drawVariable($scope.currentSI.variableName, $scope.currentSI.depthIndex);
 
       SIMapRenderer = new MapRenderer('#si-map');
+      SIMapRenderer.setSize(
+          $('.col-xs-4').width() - 5, // XXX
+          $('.col-xs-3').width());
       SIMapRenderer.drawSI($scope.currentSI);
 
       correlationRenderer = new CorrelationRenderer('#correlation-graph');

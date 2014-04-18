@@ -89,8 +89,9 @@ function createMesh(values, xList, yList, f) {
 
 export class MapRenderer {
   public showCPUE : boolean;
-  private scene;
-  private mesh;
+  private renderer : THREE.WebGLRenderer;
+  private scene : THREE.Scene;
+  private mesh : THREE.Mesh;
   private grid;
   private particles;
   private coastLine;
@@ -99,14 +100,13 @@ export class MapRenderer {
   private yStart : number;
   private yStop : number;
   private $q : ng.IQService;
-  private DataManager;
+  private DataManager : DataManager;
 
   constructor(selector : string) {
-    var lonW = 178;
-    var lonE = 191;
+    var lonW = 180;
+    var lonE = 189;
     var latS = 34;
     var latN = 46;
-    var debugMode = false;
     var xRange = {
       min: lonToX(lonW),
       max: lonToX(lonE),
@@ -120,14 +120,9 @@ export class MapRenderer {
     var aspectRatio = height / width;
 
     // initialize renderer
-    var stage = $(selector);
-    stage.height(aspectRatio * stage.width());
-    var renderer = new THREE.WebGLRenderer(),
-        rendererWidth  = stage.innerWidth(),
-        rendererHeight = stage.innerHeight();
-    renderer.setSize(rendererWidth, rendererHeight);
-    renderer.setClearColor(<any>0xffffff, 1.0);
-    stage.append(renderer.domElement);
+    this.renderer = new THREE.WebGLRenderer();
+    $(selector).append(this.renderer.domElement);
+    this.renderer.setClearColor(<any>0xffffff, 1.0);
 
     // initialize camera
     var camerax = (xRange.max + xRange.min)/2,
@@ -142,10 +137,14 @@ export class MapRenderer {
     // render
     var render = () => {
       requestAnimationFrame(render);
-      renderer.render(this.scene, camera);
+      this.renderer.render(this.scene, camera);
     };
 
     render();
+  }
+
+  setSize(width : number, height : number) {
+    this.renderer.setSize(width, height);
   }
 
   drawVariable(variableName : string, depthIndex : number) {
