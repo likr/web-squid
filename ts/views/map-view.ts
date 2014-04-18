@@ -185,15 +185,15 @@ export class MapRenderer {
         return this.DataManager.loadMOVE(SI.variableName, SI.depthIndex);
       }))
       .then(planes => {
-        var xList = planes[0][4].map(lonToX);
-        var yList = planes[0][3].map(latToY);
+        var xList = planes[0][0][4].map(lonToX);
+        var yList = planes[0][0][3].map(latToY);
         var n = SIs.length;
         var i, j, k, x, y;
-        var values = xList.map((x, i) => {
-          return yList.map((y, j) => {
+        var values = yList.map((y, i) => {
+          return xList.map((x, j) => {
             var hsi = 1;
             for (k = 0; k < n; ++k) {
-              var v = planes[k][i][j];
+              var v = planes[k][0][0][0][0][i][j];
               if (v == IGNORE_VALUE) {
                 hsi = NaN;
                 break;
@@ -201,6 +201,7 @@ export class MapRenderer {
                 hsi *= SIs[k].call(v);
               }
             }
+            return hsi;
           });
         });
         this.mesh = createMesh(values, xList, yList, Object);

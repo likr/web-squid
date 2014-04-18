@@ -21,6 +21,8 @@ export interface MainControllerScope extends ng.IScope {
   incrementLambda : () => void;
   decrementLambda : () => void;
   drawSIViews : () => void;
+  drawHSIViews : () => void;
+  activeSI : SI;
 }
 
 export function MainController(
@@ -33,6 +35,8 @@ export function MainController(
     MapRenderer : MapRendererClass) {
   var variableMapRenderer : MapRenderer;
   var SIMapRenderer : MapRenderer;
+  var SIMapRenderer2 : MapRenderer;
+  var HSIMapRenderer : MapRenderer;
   var correlationRenderer : CorrelationRenderer;
   var distributionRenderer : DistributionRenderer;
 
@@ -107,9 +111,18 @@ export function MainController(
     }
   });
 
-  var initialized = false;
+  $scope.$watch('activeSI', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      SIMapRenderer2.drawSI($scope.activeSI);
+      distributionRenderer.draw(
+          $scope.activeSI.variableName + $scope.activeSI.depthIndex,
+          $scope.activeSI.lambda);
+    }
+  });
+
+  var initialized1 = false;
   $scope.drawSIViews = () => {
-    if (!initialized) {
+    if (!initialized1) {
       variableMapRenderer = new MapRenderer('#variable-map');
       variableMapRenderer.setSize(
           $('.col-xs-4').width() - 5, // XXX
@@ -134,9 +147,31 @@ export function MainController(
       distributionRenderer = new DistributionRenderer('#scatter-plot-graph');
       distributionRenderer.draw($scope.currentSI.variableName + $scope.currentSI.depthIndex, $scope.currentSI.lambda);
 
-      initialized = true;
+      initialized1 = true;
     }
-  }
+  };
+
+  var initialized2 = false;
+  $scope.drawHSIViews = () => {
+    if (!initialized2) {
+      HSIMapRenderer = new MapRenderer('#hsi-map');
+      HSIMapRenderer.setSize(
+          $('.col-xs-4').width() - 5, // XXX
+          $('.col-xs-3').width());
+      HSIMapRenderer.drawHSI($scope.SIs);
+
+      SIMapRenderer2 = new MapRenderer('#si-map2');
+      SIMapRenderer2.setSize(
+          $('.col-xs-4').width() - 5, // XXX
+          $('.col-xs-3').width());
+
+      distributionRenderer = new DistributionRenderer('#scatter-plot-graph2');
+
+      $scope.activeSI = SIManager.SIs[0];
+
+      initialized2 = true;
+    }
+  };
 };
 MainController.$inject = [
   '$scope',
