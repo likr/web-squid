@@ -11,7 +11,7 @@
 
 
 module squid {
-export var app = angular.module('squid-hsi', ['ui.router', 'ui.date', 'ui.bootstrap'])
+export var app = angular.module('squid-hsi', ['ui.router', 'ui.bootstrap'])
   .factory('d3get', ['$q', function($q) {
     return function(xhr) {
       var deferred = $q.defer();
@@ -69,6 +69,11 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.date', 'ui.bootst
       ;
     $urlRouterProvider
       .otherwise('/setting');
+  }])
+  .config(['datepickerConfig', datepickerConfig => {
+    datepickerConfig.monthFormat = 'MM';
+    datepickerConfig.dayTitleFormat = 'yyyy/MM';
+    datepickerConfig.showWeeks = false;
   }])
   .run(['$rootScope', $rootScope => {
     $rootScope.alerts = [];
