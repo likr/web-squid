@@ -29,7 +29,7 @@ export class DataManager {
       deferred.resolve(this.dataCache[key]);
     } else {
       var v = variableName.toLowerCase();
-      var dateIndex = 0;
+      var dateIndex = this.dateIndex(this.selectedDate);
       var d = depthIndex;
       var lat = this.latStart + ':' + this.latStop;
       var lon = this.lonStart + ':' + this.lonStop;
@@ -55,7 +55,7 @@ export class DataManager {
 
   getExpectedCPUE() {
     return this.CPUEPoints.filter(d => {
-      return d.date == this.selectedDate;
+      return d.date.getTime() == this.selectedDate.getTime();
     });
   }
 
@@ -91,7 +91,7 @@ export class DataManager {
   }
 
   private key(variableName : string, date : Date, depthIndex : number) : string {
-    return date + variableName + depthIndex;
+    return this.dateIndex(date) + variableName + depthIndex;
   }
 
   private loadDataset(url : string) {

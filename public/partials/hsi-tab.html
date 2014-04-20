@@ -17,18 +17,12 @@
         <th class="col-xs-7">Variable - Depth - Smoothing Parameter</th>
         <th class="col-xs-3">Action</th>
       </tr>
-      <tr ng-repeat="SI in SIs" style="height: 70px;">
-        <td><input type="checkbox" ng-model="SI.active"/></td>
-        <td>{{SI.variableName}} - {{SI.depthIndex}} - {{SI.lambda}}</td>
+      <tr ng-repeat="SI in SIs" ng-class="{'success': SI == selectedSI}">
+        <td ng-click="check(SI)"><input type="checkbox" ng-model="SI.active"/></td>
+        <td ng-click="check(SI)" style="cursor: pointer;">{{SI.variableName}} - {{SI.depthIndex}} - {{SI.lambda}}</td>
         <td>
-          <button class="btn btn-default btn-xs btn-block" ng-click="loadSI(SI)">Load</button>
-          <button class="btn btn-default btn-xs btn-block" ng-click="removeSI($index)">Remove</button>
+          <button class="btn btn-default btn-xs btn-block" ng-click="select(SI)">Show</button>
         </td>
-      </tr>
-      <tr style="height: 70px;" ng-repeat="dummy in SIPaddings">
-        <td></td>
-        <td></td>
-        <td></td>
       </tr>
     </table>
   </div>

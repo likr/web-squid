@@ -1,43 +1,63 @@
 <div class="row">
-  <form class="form">
+  <form class="form-horizontal">
     <div class="form-group">
-      <label>CPUE From</label>
-      <input class="form-control" ng-model="settings.cpueFrom" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+      <label class="col-xs-2 control-label">CPUE From</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.cpueFrom" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>CPUE To</label>
-      <input class="form-control" ng-model="settings.cpueTo" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+      <label class="col-xs-2 control-label">CPUE To</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.cpueTo" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>CPUE File</label>
-      <input type="file" id="fileInput"/>
+      <label class="col-xs-2 control-label">CPUE File</label>
+      <div class="col-xs-10">
+        <input type="file" id="fileInput"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>OPeNDAP Endpoint URL</label>
-      <input class="form-control" ng-model="settings.opendapEndpoint"/>
+      <label class="col-xs-2 control-label">OPeNDAP Endpoint URL</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.opendapEndpoint"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>Latitude From</label>
-      <input class="form-control" type="number" min="0" max="90" ng-model="settings.latFrom"/>
+      <label class="col-xs-2 control-label">Latitude From</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="90" ng-model="settings.latFrom"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>Latitude To</label>
-      <input class="form-control" type="number" min="0" max="90" ng-model="settings.latTo"/>
+      <label class="col-xs-2 control-label">Latitude To</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="90" ng-model="settings.latTo"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>Longitude From</label>
-      <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonFrom"/>
+      <label class="col-xs-2 control-label">Longitude From</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonFrom"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>Longitude To</label>
-      <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonTo"/>
+      <label class="col-xs-2 control-label">Longitude To</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonTo"/>
+      </div>
     </div>
     <div class="form-group">
-      <label>Depth Max</label>
-      <input class="form-control" type="number" min="0" ng-model="settings.depthMax"/>
+      <label class="col-xs-2 control-label">Depth Max</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" ng-model="settings.depthMax"/>
+      </div>
     </div>
-    <div>
-      <button class="btn btn-default" ng-click="settings.start()">Start</button>
+    <div class="form-group">
+      <div class="col-xs-offset-2 col-xs-10">
+        <button class="btn btn-default" ng-click="settings.start()">Start</button>
+      </div>
     </div>
   </form>
 </div>

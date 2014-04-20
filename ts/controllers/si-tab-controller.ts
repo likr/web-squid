@@ -72,12 +72,14 @@ export function SITabController(
       $('.col-xs-4').width() - 5, // XXX
       $('.col-xs-3').width());
   variableMapRenderer.drawVariable($scope.currentSI.variableName, $scope.currentSI.depthIndex);
+  variableMapRenderer.drawParticles();
 
   SIMapRenderer.appendTo('#si-map');
   SIMapRenderer.setSize(
       $('.col-xs-4').width() - 5, // XXX
       $('.col-xs-3').width());
   SIMapRenderer.drawSI($scope.currentSI);
+  SIMapRenderer.drawParticles();
 
   var correlationRenderer = new CorrelationRenderer('#correlation-graph');
   correlationRenderer.depthSelected = (d : number) => {
@@ -114,6 +116,15 @@ export function SITabController(
       SIMapRenderer.drawSI($scope.currentSI);
       correlationRenderer.draw($scope.currentSI.variableName, $scope.currentSI.lambda);
       distributionRenderer.draw($scope.currentSI.variableName + $scope.currentSI.depthIndex, $scope.currentSI.lambda);
+    }
+  });
+
+  $scope.$watch('DataManager.selectedDate', (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      variableMapRenderer.drawVariable($scope.currentSI.variableName, $scope.currentSI.depthIndex);
+      variableMapRenderer.drawParticles();
+      SIMapRenderer.drawSI($scope.currentSI);
+      SIMapRenderer.drawParticles();
     }
   });
 }

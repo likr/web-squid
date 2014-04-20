@@ -6,16 +6,20 @@
 module squid {
 export interface MainControllerScope extends ng.IScope {
   SIs : SI[];
+  DataManager : DataManager;
 }
 
 
 export function MainController(
     $scope : MainControllerScope,
+    DataManager : DataManager,
     SIManager : SIManager) {
   $scope.SIs = SIManager.SIs;
+  $scope.DataManager = DataManager;
 };
 MainController.$inject = [
   '$scope',
-  'SIManager'
+  'DataManager',
+  'SIManager',
 ];
 }

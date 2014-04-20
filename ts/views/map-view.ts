@@ -188,6 +188,12 @@ export class MapRenderer {
         return this.DataManager.loadMOVE(SI.variableName, SI.depthIndex);
       }))
       .then(planes => {
+        if (this.mesh !== undefined) {
+          this.scene.remove(this.mesh);
+        }
+        if (SIs.length === 0) {
+          return;
+        }
         var xList = planes[0][0][4].map(lonToX);
         var yList = planes[0][0][3].map(latToY);
         var n = SIs.length;
@@ -241,41 +247,39 @@ export class MapRenderer {
     });
   }
 
-  private drawParticles() {
+  drawParticles() {
     if (this.particles !== undefined) {
       this.scene.remove(this.particles);
     }
-    if (this.showCPUE) {
-      var points = this.DataManager.getExpectedCPUE();
-      var geometry = new THREE.Geometry();
-      var material = new THREE.ParticleSystemMaterial({
-        size: 5,
-        sizeAttenuation: false,
-        vertexColors: true
-      });
+    var points = this.DataManager.getExpectedCPUE();
+    var geometry = new THREE.Geometry();
+    var material = new THREE.ParticleSystemMaterial({
+      size: 5,
+      sizeAttenuation: false,
+      vertexColors: true
+    });
 
-      var scale = d3.scale.linear()
-                    .domain(d3.extent(points, (p : any) => p.cpue))
-                    .range([240, 360]);
-      var _numTo16Color = function (num) {
-        return d3.hsl(scale(num), 1, 0.5).toString();
-      };
+    var scale = d3.scale.linear()
+                  .domain(d3.extent(points, (p : any) => p.cpue))
+                  .range([240, 360]);
+    var _numTo16Color = function (num) {
+      return d3.hsl(scale(num), 1, 0.5).toString();
+    };
 
-      var colors = [];
-      for ( var i = 0; i < points.length; i ++ ) {
-        var p = points[i];
-        var vertex = new THREE.Vector3();
-        vertex.x = lonToX(p.x);
-        vertex.y = latToY(p.y);
-        vertex.z = 0;
-        geometry.vertices.push( vertex );
-        colors[i] = new THREE.Color(_numTo16Color(p.cpue));
-      }
-      geometry.colors = colors;
-
-      this.particles = new THREE.ParticleSystem(geometry, material);
-      this.scene.add(this.particles);
+    var colors = [];
+    for (var i = 0; i < points.length; ++i) {
+      var p = points[i];
+      var vertex = new THREE.Vector3();
+      vertex.x = lonToX(p.x);
+      vertex.y = latToY(p.y);
+      vertex.z = 0;
+      geometry.vertices.push(vertex);
+      colors[i] = new THREE.Color(_numTo16Color(p.cpue));
     }
+    geometry.colors = colors;
+
+    this.particles = new THREE.ParticleSystem(geometry, material);
+    this.scene.add(this.particles);
   }
 
   private drawCoastLine() {
