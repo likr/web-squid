@@ -1,40 +1,63 @@
-<div class="modal-header">
-</div>
-<div class="modal-body">
-  <form class="form">
+<div class="row">
+  <form class="form-horizontal">
     <div class="form-group">
-      <label>Prediction Target</label>
-      <input class="form-control" ui-date ng-model="settings.selectedDate"/>
-    </div>
-    <div class="form-group">
-      <label>CPUE From</label>
-      <input class="form-control" ui-date ng-model="settings.cpueDateFrom"/>
-    </div>
-    <div class="form-group">
-      <label>CPUE To</label>
-      <input class="form-control" ui-date ng-model="settings.cpueDateTo"/>
-    </div>
-    <div class="form-group">
-      <label>OPeNDAP Endpoint URL</label>
-      <input class="form-control" ng-model="settings.opendapEndpoint"/>
-    </div>
-    <div class="form-group">
-      <label>Latitude From</label>
-      <div>
-        <label class="radio-inline"><input class="radio" type="radio" ng-model="latFromDirection" value="N"/>N</label>
-        <label class="radio-inline"><input class="radio" type="radio" ng-model="latFromDirection" value="S"/>S</label>
+      <label class="col-xs-2 control-label">CPUE From</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.cpueFrom" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
       </div>
-      <input class="form-control" type="number" min="0" max="90" ng-model="latFrom"/>
     </div>
     <div class="form-group">
-      <label>Latitude To</label>
-      <div>
-        <label class="radio-inline"><input class="radio" type="radio" ng-model="latToDirection" value="N"/>N</label>
-        <label class="radio-inline"><input class="radio" type="radio" ng-model="latToDirection" value="S"/>S</label>
+      <label class="col-xs-2 control-label">CPUE To</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.cpueTo" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
       </div>
-      <input class="form-control" type="number" min="0" max="90" ng-model="latTo"/>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">CPUE File</label>
+      <div class="col-xs-10">
+        <input type="file" id="fileInput"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">OPeNDAP Endpoint URL</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="settings.opendapEndpoint"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Latitude From</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="90" ng-model="settings.latFrom"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Latitude To</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="90" ng-model="settings.latTo"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Longitude From</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonFrom"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Longitude To</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" max="360" ng-model="settings.lonTo"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Depth Max</label>
+      <div class="col-xs-10">
+        <input class="form-control" type="number" min="0" ng-model="settings.depthMax"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-offset-2 col-xs-10">
+        <button class="btn btn-default" ng-click="settings.start()">Start</button>
+      </div>
     </div>
   </form>
-</div>
-<div class="modal-footer">
 </div>
