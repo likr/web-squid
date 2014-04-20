@@ -1,9 +1,9 @@
 - hosts: all
   vars:
     proxy_env:
-      http_proxy: http://proxy.kuins.net:8080/
-      https_proxy: http://proxy.kuins.net:8080/
-      ftp_proxy: http://proxy.kuins.net:8080/
+      http_proxy:
+      https_proxy:
+      ftp_proxy:
     gds_env:
       GADDIR: /usr/share/grads/
   sudo: yes
@@ -34,6 +34,23 @@
       environment: proxy_env
 
 
+    # Tomcat6
+    - name: install tomcat6
+      yum: name=tomcat6
+
+    - name: install tomcat6-webapps
+      yum: name=tomcat6-webapps
+
+    - name: install tomcat6-admin-webapps
+      yum: name=tomcat6-admin-webapps
+
+    - name: add tomcat.sh
+      copy: src=tomcat.sh dest=/etc/profile.d/tomcat.sh
+
+    - name: add dods
+      copy: src=dods.war dest=/var/lib/tomcat6/webapps/dods.war
+
+
     # GDS
     - name: install GrADS
       yum: name=grads
@@ -41,15 +58,13 @@
 
     - name: fetch GDS
       get_url: url=ftp://cola.gmu.edu/grads/gds/gds-2.0.tar.gz dest=/tmp/gds-2.0.tar.gz
+      environment: proxy_env
 
     - name: unarchive GDS
       command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
 
     - name: add gds.xml
       copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
-
-    - name: add server.xml
-      copy: src=server.xml dest=/var/lib/gds-2.0/tomcat4/conf/server.xml
 
     - name: add jetty-gds.xml
       copy: src=jetty-gds.xml dest=/var/lib/gds-2.0/jetty4/jetty-gds.xml
@@ -71,6 +86,5 @@
     - name: restart httpd
       service: name=httpd enabled=yes state=restarted
 
-    - name: restart gds
-      command: /var/lib/gds-2.0/rebootserver
-      environment: gds_env
+    - name: restart tomcat
+      service: name=tomcat6 enabled=yes state=restarted
