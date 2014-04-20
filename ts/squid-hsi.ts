@@ -1,8 +1,10 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
 /// <reference path="lib/jsdap.d.ts"/>
+/// <reference path="controllers/hsi-tab-controller.ts"/>
 /// <reference path="controllers/main-controller.ts"/>
 /// <reference path="controllers/setting-controller.ts"/>
+/// <reference path="controllers/si-tab-controller.ts"/>
 /// <reference path="views/correlation-view.ts"/>
 /// <reference path="views/distribution-view.ts"/>
 /// <reference path="views/map-view.ts"/>
@@ -30,30 +32,24 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.bootstrap'])
   .factory('CorrelationRenderer', CorrelationRendererFactory)
   .factory('DistributionRenderer', DistributionRendererFactory)
   .factory('MapRenderer', MapRendererFactory)
-  .filter('variableName', [() => {
-    return (variable : string) : string => {
-      switch (variable) {
-        case 'S':
-          return 'Salinity';
-        case 'T':
-          return 'Temperature';
-        case 'U':
-          return 'Horizontal Velocity (Lat.)';
-        case 'V':
-          return 'Horizontal Velocity (Lon.)';
-        case 'W':
-          return 'Vertical Velocity';
-        case 'HM':
-          return 'Sea Surface Height';
-        default:
-          return '';
-      }
-    }
-  }])
   .service('DataManager', DataManager)
   .service('SIManager', SIManager)
+  .service('variableMapRenderer', ['MapRenderer', (MapRenderer : MapRendererClass) => {
+    return new MapRenderer;
+  }])
+  .service('SIMapRenderer', ['MapRenderer', (MapRenderer : MapRendererClass) => {
+    return new MapRenderer;
+  }])
+  .service('SIMapRenderer2', ['MapRenderer', (MapRenderer : MapRendererClass) => {
+    return new MapRenderer;
+  }])
+  .service('HSIMapRenderer', ['MapRenderer', (MapRenderer : MapRendererClass) => {
+    return new MapRenderer;
+  }])
+  .controller('HSITabController', HSITabController)
   .controller('MainController', MainController)
   .controller('SettingController', SettingController)
+  .controller('SITabController', SITabController)
   .config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
     $stateProvider
       .state('setting', {
@@ -65,6 +61,21 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.bootstrap'])
         controller: 'MainController',
         templateUrl: 'partials/main.html',
         url: '/main',
+        onEnter: ['$state', 'DataManager', ($state, DataManager) => {
+          if (!DataManager.initialized()) {
+            $state.go('setting');
+          }
+        }],
+      })
+      .state('main.si', {
+        controller: 'SITabController',
+        templateUrl: 'partials/si-tab.html',
+        url: '/si',
+      })
+      .state('main.hsi', {
+        controller: 'HSITabController',
+        templateUrl: 'partials/hsi-tab.html',
+        url: '/hsi',
       })
       ;
     $urlRouterProvider

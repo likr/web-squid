@@ -57,7 +57,7 @@ export class SettingController {
       this.DataManager
         .initialize(data, this.opendapEndpoint)
         .then(() => {
-          this.$state.go('main');
+          this.$state.go('main.si');
         });
     };
     reader.readAsText(file);

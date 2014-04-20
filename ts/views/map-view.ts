@@ -102,7 +102,7 @@ export class MapRenderer {
   private $q : ng.IQService;
   private DataManager : DataManager;
 
-  constructor(selector : string) {
+  constructor() {
     var lonW = 180;
     var lonE = 189;
     var latS = 34;
@@ -121,7 +121,6 @@ export class MapRenderer {
 
     // initialize renderer
     this.renderer = new THREE.WebGLRenderer();
-    $(selector).append(this.renderer.domElement);
     this.renderer.setClearColor(<any>0xffffff, 1.0);
 
     // initialize camera
@@ -143,7 +142,11 @@ export class MapRenderer {
     render();
   }
 
-  setSize(width : number, height : number) {
+  appendTo(selector : string) : void {
+    $(selector).append(this.renderer.domElement);
+  }
+
+  setSize(width : number, height : number) : void {
     this.renderer.setSize(width, height);
   }
 
@@ -297,7 +300,7 @@ export class MapRenderer {
 
 
 export interface MapRendererClass {
-  new (selector : string) : MapRenderer;
+  new () : MapRenderer;
 }
 
 export function MapRendererFactory($q : ng.IQService, DataManager) : MapRendererClass {
