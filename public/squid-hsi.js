@@ -93,6 +93,8 @@ var spline;
         function SplineInterpolator(S, xAccessor, yAccessor, lambda) {
             var xy = S.map(function (d) {
                 return [+xAccessor(d), +yAccessor(d)];
+            }).filter(function (d) {
+                return d[0] !== 0;
             });
             xy.sort(function (d1, d2) {
                 return d1[0] - d2[0];
@@ -165,6 +167,25 @@ var spline;
                 }
             }
             return minValue;
+        };
+
+        SplineInterpolator.prototype.domain = function () {
+            return [this.x[0], this.x[this.x.length - 1]];
+        };
+
+        SplineInterpolator.prototype.range = function () {
+            return [this.min(), this.max()];
+        };
+
+        SplineInterpolator.prototype.curve = function (nInterval) {
+            var domain = this.domain();
+            var delta = (domain[1] - domain[0]) / nInterval;
+            var vals = [];
+            var i, x;
+            for (i = 0, x = domain[0]; i < nInterval; ++i, x += delta) {
+                vals[i] = [x, this.interpolate(x)];
+            }
+            return vals;
         };
         return SplineInterpolator;
     })();
@@ -415,10 +436,11 @@ var squid;
     var svgMargin = 40;
 
     var DistributionRenderer = (function () {
-        function DistributionRenderer(selector) {
+        function DistributionRenderer(selector, width, height) {
             var _this = this;
             this.rootSelection = d3.select(selector).append('svg');
-            this.svgWidth = this.svgHeight = Math.min($(selector).width(), $(selector).height());
+            this.svgWidth = width;
+            this.svgHeight = height;
             this.rootSelection.attr({
                 width: this.svgWidth,
                 height: this.svgHeight
@@ -850,7 +872,7 @@ var squid;
         SIMapRenderer.setSize($('.col-xs-4').width() - 5, $('.col-xs-3').width());
         SIMapRenderer.drawParticles();
 
-        var distributionRenderer = new DistributionRenderer('#scatter-plot-graph2');
+        var distributionRenderer = new DistributionRenderer('#scatter-plot-graph2', $('.col-xs-3').width(), $('.col-xs-3').width());
 
         if (SIManager.SIs.length > 0) {
             $scope.selectedSI = SIManager.SIs[0];
@@ -865,6 +887,15 @@ var squid;
 
         $scope.check = function (SI) {
             SI.active = !SI.active;
+        };
+
+        $scope.export = function (SI) {
+            var text = SI.interpolator.curve(100).map(function (xy) {
+                var x = ('    ' + xy[0].toFixed(3)).slice(-9);
+                var y = ('    ' + xy[1].toFixed(3)).slice(-9);
+                return x + ' ' + y;
+            }).join('\r\n');
+            return 'data:text/plain;base64,' + btoa(text);
         };
 
         $scope.activeSIcount = function () {
@@ -959,6 +990,9 @@ var squid;
             }
             var reader = new FileReader();
             reader.onload = function (e) {
+                function ignore(v) {
+                    return v == -999 ? 0 : v;
+                }
                 var id = 0;
                 var data = d3.csv.parse(e.target.result).map(function (d) {
                     var obj = {
@@ -967,14 +1001,14 @@ var squid;
                         y: +d.LAT,
                         date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
                         cpue: +d.CPUE,
-                        hm0: +d.HM,
-                        hmg0: +d.HMg
+                        hm0: ignore(+d.HM),
+                        hmg0: ignore(+d.HMg)
                     };
                     ['S', 'T', 'U', 'V', 'W'].forEach(function (v) {
                         var i;
                         for (i = 0; i < 54; ++i) {
                             var val = +d[v + ('0' + (i + 1)).slice(-2)];
-                            obj[v.toLowerCase() + i] = val == -999 ? 0 : val;
+                            obj[v.toLowerCase() + i] = ignore(val);
                         }
                     });
                     return obj;
@@ -1005,7 +1039,7 @@ var squid;
     var maxDepth = 25;
 
     var CorrelationRenderer = (function () {
-        function CorrelationRenderer(selector) {
+        function CorrelationRenderer(selector, width, height) {
             var _this = this;
             var Rs = (function () {
                 var Rs = [];
@@ -1016,7 +1050,8 @@ var squid;
                 return Rs;
             })();
             this.rootSelection = d3.select(selector).append('svg');
-            this.svgWidth = this.svgHeight = Math.min($(selector).width(), $(selector).height());
+            this.svgWidth = width;
+            this.svgHeight = height;
             this.rootSelection.attr({
                 width: this.svgWidth,
                 height: this.svgHeight
@@ -1172,7 +1207,7 @@ var squid;
         SIMapRenderer.drawSI($scope.currentSI);
         SIMapRenderer.drawParticles();
 
-        var correlationRenderer = new CorrelationRenderer('#correlation-graph');
+        var correlationRenderer = new CorrelationRenderer('#correlation-graph', $('.col-xs-3').width(), $('.col-xs-3').width());
         correlationRenderer.depthSelected = function (d) {
             $scope.$apply(function () {
                 $scope.currentSI.depthIndex = d;
@@ -1181,7 +1216,7 @@ var squid;
         correlationRenderer.draw($scope.currentSI.variableName, $scope.currentSI.lambda);
         correlationRenderer.activate($scope.currentSI.depthIndex);
 
-        var distributionRenderer = new DistributionRenderer('#scatter-plot-graph');
+        var distributionRenderer = new DistributionRenderer('#scatter-plot-graph', $('.col-xs-3').width(), $('.col-xs-3').width());
         distributionRenderer.draw($scope.currentSI.variableName + $scope.currentSI.depthIndex, $scope.currentSI.lambda);
 
         $scope.$watch('currentSI.variableName', function (newValue, oldValue) {
@@ -1267,6 +1302,9 @@ var squid;
         'MapRenderer', function (MapRenderer) {
             return new MapRenderer;
         }]).controller('HSITabController', squid.HSITabController).controller('MainController', squid.MainController).controller('SettingController', squid.SettingController).controller('SITabController', squid.SITabController).config([
+        '$compileProvider', function ($compileProvider) {
+            $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|data):/);
+        }]).config([
         '$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
             $stateProvider.state('setting', {
                 controller: 'SettingController as settings',
