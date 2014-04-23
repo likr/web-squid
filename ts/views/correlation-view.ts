@@ -18,7 +18,7 @@ export class CorrelationRenderer {
   private line : D3.Svg.Line;
   public depthSelected : (depth : number) => void;
 
-  constructor(selector : string) {
+  constructor(selector : string, width : number, height : number) {
     var Rs = (() => {
       var Rs = [];
       var depth;
@@ -28,7 +28,8 @@ export class CorrelationRenderer {
       return Rs;
     })();
     this.rootSelection = d3.select(selector).append('svg');
-    this.svgWidth = this.svgHeight = Math.min($(selector).width(), $(selector).height());
+    this.svgWidth = width;
+    this.svgHeight = height;
     this.rootSelection.attr({
       width: this.svgWidth,
       height: this.svgHeight,
@@ -151,7 +152,7 @@ export class CorrelationRenderer {
 }
 
 export interface CorrelationRendererClass {
-  new (selector : string) : CorrelationRenderer;
+  new (selector : string, width : number, height : number) : CorrelationRenderer;
 }
 
 export function CorrelationRendererFactory(DataManager : DataManager) : CorrelationRendererClass {

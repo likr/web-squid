@@ -50,6 +50,9 @@ export var app = angular.module('squid-hsi', ['ui.router', 'ui.bootstrap'])
   .controller('MainController', MainController)
   .controller('SettingController', SettingController)
   .controller('SITabController', SITabController)
+  .config(['$compileProvider', $compileProvider => {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|file|data):/);
+  }])
   .config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
     $stateProvider
       .state('setting', {

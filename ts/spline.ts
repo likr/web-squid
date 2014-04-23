@@ -97,7 +97,9 @@ export class SplineInterpolator {
   private y : number[];
 
   constructor(S, xAccessor, yAccessor, lambda) {
-    var xy = S.map(d => [+xAccessor(d), +yAccessor(d)]);
+    var xy = S
+      .map(d => [+xAccessor(d), +yAccessor(d)])
+      .filter(d => d[0] !== 0);
     xy.sort((d1, d2) => d1[0] - d2[0]);
     var x0 = undefined;
     var i, n = xy.length, x, sum, count;
@@ -167,6 +169,25 @@ export class SplineInterpolator {
       }
     }
     return minValue;
+  }
+
+  domain() : number[] {
+    return [this.x[0], this.x[this.x.length - 1]];
+  }
+
+  range() : number[] {
+    return [this.min(), this.max()];
+  }
+
+  curve(nInterval : number) : number[][] {
+    var domain = this.domain();
+    var delta = (domain[1] - domain[0]) / nInterval;
+    var vals = [];
+    var i, x;
+    for (i = 0, x = domain[0]; i < nInterval; ++i, x += delta) {
+      vals[i] = [x, this.interpolate(x)];
+    }
+    return vals;
   }
 }
 

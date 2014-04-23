@@ -16,9 +16,10 @@ export class DistributionRenderer {
   private svgWidth : number;
   private svgHeight : number;
 
-  constructor(selector : string) {
+  constructor(selector : string, width : number, height : number) {
     this.rootSelection = d3.select(selector).append('svg');
-    this.svgWidth = this.svgHeight = Math.min($(selector).width(), $(selector).height());
+    this.svgWidth = width;
+    this.svgHeight = height;
     this.rootSelection.attr({
       width: this.svgWidth,
       height: this.svgHeight,
@@ -161,7 +162,7 @@ export class DistributionRenderer {
 }
 
 export interface DistributionRendererClass {
-  new (selector : string) : DistributionRenderer;
+  new (selector : string, width : number, height : number) : DistributionRenderer;
 }
 
 export function DistributionRendererFactory(DataManager : DataManager) : DistributionRendererClass {

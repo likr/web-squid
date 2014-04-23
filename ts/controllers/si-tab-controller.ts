@@ -81,7 +81,10 @@ export function SITabController(
   SIMapRenderer.drawSI($scope.currentSI);
   SIMapRenderer.drawParticles();
 
-  var correlationRenderer = new CorrelationRenderer('#correlation-graph');
+  var correlationRenderer = new CorrelationRenderer(
+      '#correlation-graph',
+      $('.col-xs-3').width(),
+      $('.col-xs-3').width());
   correlationRenderer.depthSelected = (d : number) => {
     $scope.$apply(() => {
       $scope.currentSI.depthIndex = d;
@@ -90,7 +93,10 @@ export function SITabController(
   correlationRenderer.draw($scope.currentSI.variableName, $scope.currentSI.lambda);
   correlationRenderer.activate($scope.currentSI.depthIndex);
 
-  var distributionRenderer = new DistributionRenderer('#scatter-plot-graph');
+  var distributionRenderer = new DistributionRenderer(
+      '#scatter-plot-graph',
+      $('.col-xs-3').width(),
+      $('.col-xs-3').width());
   distributionRenderer.draw($scope.currentSI.variableName + $scope.currentSI.depthIndex, $scope.currentSI.lambda);
 
   $scope.$watch('currentSI.variableName', (newValue, oldValue) => {
