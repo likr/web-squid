@@ -8,11 +8,11 @@ export class SettingController {
   opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
   predictionDate = new Date(2013, 6, 1);
   cpueFrom = new Date(1999, 0, 1);
-  cpueTo = new Date(2012, 11, 31);
+  cpueTo = new Date(2013, 11, 31);
   latFrom = 34;
   latTo = 46;
   lonFrom = 180;
-  lonTo = 189;
+  lonTo = 200;
   depthMax = 30;
 
   constructor(private $scope, private $state, private DataManager) {

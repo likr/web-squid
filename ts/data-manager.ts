@@ -12,7 +12,7 @@ export class DataManager {
   public latStop = 312;
   public latLength = this.latStop - this.latStart;
   public lonStart = 551;
-  public lonStop = 605;
+  public lonStop = 671;
   public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
   private dataCache = {};
