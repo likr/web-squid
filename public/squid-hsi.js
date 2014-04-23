@@ -321,7 +321,7 @@ var squid;
             this.latStop = 312;
             this.latLength = this.latStop - this.latStart;
             this.lonStart = 551;
-            this.lonStop = 605;
+            this.lonStop = 671;
             this.lonLength = this.lonStop - this.lonStart;
             this.dataCache = {};
         }
@@ -337,7 +337,23 @@ var squid;
                 var d = depthIndex;
                 var lat = this.latStart + ':' + this.latStop;
                 var lon = this.lonStart + ':' + this.lonStop;
-                var dataUrl = this.opendapEndpoint + variableName.toLowerCase() + '.dods?' + v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
+                var query = v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
+                if (/fcst\d{4}/.test(this.opendapEndpoint)) {
+                    switch (v) {
+                        case 'u':
+                        case 'v':
+                        case 't':
+                        case 's':
+                        case 'hm':
+                            var file = 'fcst';
+                            break;
+                        default:
+                            var file = v;
+                    }
+                } else {
+                    var file = v;
+                }
+                var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
                 loadData(dataUrl, function (data) {
                     deferred.resolve(_this.dataCache[key] = data);
                 });
@@ -367,7 +383,7 @@ var squid;
 
         DataManager.prototype.initialize = function (CPUEPoints, opendapEndpoint) {
             var _this = this;
-            return this.loadDataset(this.opendapEndpoint + 's').then(function (dataset) {
+            return this.loadDataset(this.opendapEndpoint + 'w').then(function (dataset) {
                 _this.dimensions = {
                     time: dataset.time.shape[0],
                     lev: dataset.lev.shape[0],
@@ -375,10 +391,10 @@ var squid;
                     lon: dataset.lon.shape[0]
                 };
                 return _this.$q.all({
-                    time: _this.loadData(_this.opendapEndpoint + 's.dods?s[0:' + (_this.dimensions.time - 1) + '][0][0][0]'),
-                    lev: _this.loadData(_this.opendapEndpoint + 's.dods?s[0][0:' + (_this.dimensions.lev - 1) + '][0][0]'),
-                    lat: _this.loadData(_this.opendapEndpoint + 's.dods?s[0][0][0:' + (_this.dimensions.lat - 1) + '][0]'),
-                    lon: _this.loadData(_this.opendapEndpoint + 's.dods?s[0][0][0][0:' + (_this.dimensions.lon - 1) + ']')
+                    time: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0:' + (_this.dimensions.time - 1) + '][0][0][0]'),
+                    lev: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0:' + (_this.dimensions.lev - 1) + '][0][0]'),
+                    lat: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0][0:' + (_this.dimensions.lat - 1) + '][0]'),
+                    lon: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0][0][0:' + (_this.dimensions.lon - 1) + ']')
                 });
             }).then(function (axes) {
                 _this.axes = {
@@ -971,11 +987,11 @@ var squid;
             this.opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
             this.predictionDate = new Date(2013, 6, 1);
             this.cpueFrom = new Date(1999, 0, 1);
-            this.cpueTo = new Date(2012, 11, 31);
+            this.cpueTo = new Date(2013, 11, 31);
             this.latFrom = 34;
             this.latTo = 46;
             this.lonFrom = 180;
-            this.lonTo = 189;
+            this.lonTo = 200;
             this.depthMax = 30;
         }
         SettingController.prototype.start = function () {
@@ -1002,7 +1018,8 @@ var squid;
                         date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
                         cpue: +d.CPUE,
                         hm0: ignore(+d.HM),
-                        hmg0: ignore(+d.HMg)
+                        hmgrad0: ignore(+d.HMg),
+                        mld0: ignore(+d.MLD)
                     };
                     ['S', 'T', 'U', 'V', 'W'].forEach(function (v) {
                         var i;
@@ -1036,7 +1053,7 @@ var squid;
 var squid;
 (function (squid) {
     var svgMargin = 20;
-    var maxDepth = 25;
+    var maxDepth = 30;
 
     var CorrelationRenderer = (function () {
         function CorrelationRenderer(selector, width, height) {
@@ -1173,7 +1190,9 @@ var squid;
             { value: 'u', name: 'Horizontal Velocity (Lon.)' },
             { value: 'v', name: 'Horizontal Velocity (Lat.)' },
             { value: 'w', name: 'Vertical Velocity' },
-            { value: 'hm', name: 'Sea Surface Height' }
+            { value: 'hm', name: 'Sea Surface Height' },
+            { value: 'hmgrad', name: 'Sea Surface Height (grad)' },
+            { value: 'mld', name: 'MLD' }
         ];
 
         $scope.saveSI = function () {
