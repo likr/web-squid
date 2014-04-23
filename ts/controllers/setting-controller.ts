@@ -29,6 +29,9 @@ export class SettingController {
     }
     var reader = new FileReader();
     reader.onload = e => {
+      function ignore(v : number) : number {
+        return v == -999 ? 0 : v;
+      }
       var id = 0;
       var data = d3.csv.parse(e.target.result).map(d => {
         var obj = {
@@ -37,14 +40,14 @@ export class SettingController {
           y: +d.LAT,
           date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
           cpue: +d.CPUE,
-          hm0: +d.HM,
-          hmg0: +d.HMg,
+          hm0: ignore(+d.HM),
+          hmg0: ignore(+d.HMg),
         };
         ['S', 'T', 'U', 'V', 'W'].forEach(v => {
           var i;
           for (i = 0; i < 54; ++i) {
             var val = +d[v + ('0' + (i + 1)).slice(-2)]
-            obj[v.toLowerCase() + i] = val == -999 ? 0 : val;
+            obj[v.toLowerCase() + i] = ignore(val);
           }
         });
         return obj;
