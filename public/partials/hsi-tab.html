@@ -22,6 +22,7 @@
         <td ng-click="check(SI)" style="cursor: pointer;">{{SI.variableName}} - {{SI.depthIndex}} - {{SI.lambda}}</td>
         <td>
           <button class="btn btn-default btn-xs btn-block" ng-click="select(SI)">Show</button>
+          <a class="btn btn-default btn-xs btn-block" download="{{SI.variableName}}-{{SI.depthIndex}}-{{SI.lambda}}.txt" ng-href="{{export(SI)}}">Export</a>
         </td>
       </tr>
     </table>

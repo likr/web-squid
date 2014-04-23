@@ -10,6 +10,7 @@ export interface HSITabControllerScope extends ng.IScope {
   select : (SI : SI) => void;
   check : (SI : SI) => void;
   activeSIcount : () => number;
+  export : (SI : SI) => string;
 }
 
 
@@ -48,6 +49,15 @@ export function HSITabController(
 
   $scope.check = (SI : SI) => {
     SI.active = !SI.active;
+  };
+
+  $scope.export = (SI : SI) => {
+    var text = SI.interpolator.curve(100).map(xy => {
+      var x = ('    ' + xy[0].toFixed(3)).slice(-9);
+      var y = ('    ' + xy[1].toFixed(3)).slice(-9);
+      return x + ' ' + y;
+    }).join('\r\n');
+    return 'data:text/plain;base64,' + btoa(text);
   };
 
   $scope.activeSIcount = () : number => {

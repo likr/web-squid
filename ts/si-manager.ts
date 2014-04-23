@@ -3,7 +3,7 @@
 module squid {
 export class SI {
   public active = true;
-  private interpolator;
+  public interpolator;
   private scale;
 
   constructor(private CPUEs, private variableName_ : string, private depthIndex_ : number, private lambda_ : number) {
