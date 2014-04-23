@@ -5,7 +5,7 @@
 
 module squid {
 var svgMargin = 20;
-var maxDepth = 25;
+var maxDepth = 30;
 
 export class CorrelationRenderer {
   private DataManager : DataManager;

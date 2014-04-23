@@ -12,7 +12,7 @@ export class DataManager {
   public latStop = 312;
   public latLength = this.latStop - this.latStart;
   public lonStart = 551;
-  public lonStop = 605;
+  public lonStop = 671;
   public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
   private dataCache = {};
@@ -33,7 +33,23 @@ export class DataManager {
       var d = depthIndex;
       var lat = this.latStart + ':' + this.latStop;
       var lon = this.lonStart + ':' + this.lonStop;
-      var dataUrl = this.opendapEndpoint + variableName.toLowerCase() + '.dods?' + v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
+      var query = v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
+      if (/fcst\d{4}/.test(this.opendapEndpoint)) {
+        switch (v) {
+          case 'u':
+          case 'v':
+          case 't':
+          case 's':
+          case 'hm':
+            var file = 'fcst';
+            break;
+          default:
+            var file = v;
+        }
+      } else {
+        var file = v;
+      }
+      var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
       loadData(dataUrl, data => {
         deferred.resolve(this.dataCache[key] = data);
       });
@@ -60,7 +76,7 @@ export class DataManager {
   }
 
   initialize(CPUEPoints, opendapEndpoint : string) {
-    return this.loadDataset(this.opendapEndpoint + 's')
+    return this.loadDataset(this.opendapEndpoint + 'w')
       .then(dataset => {
         this.dimensions = {
           time: dataset.time.shape[0],
@@ -69,10 +85,10 @@ export class DataManager {
           lon: dataset.lon.shape[0],
         };
         return this.$q.all({
-          time: this.loadData(this.opendapEndpoint + 's.dods?s[0:' + (this.dimensions.time - 1) + '][0][0][0]'),
-          lev: this.loadData(this.opendapEndpoint + 's.dods?s[0][0:' + (this.dimensions.lev - 1) + '][0][0]'),
-          lat: this.loadData(this.opendapEndpoint + 's.dods?s[0][0][0:' + (this.dimensions.lat - 1) + '][0]'),
-          lon: this.loadData(this.opendapEndpoint + 's.dods?s[0][0][0][0:' + (this.dimensions.lon - 1) + ']'),
+          time: this.loadData(this.opendapEndpoint + 'w.dods?w[0:' + (this.dimensions.time - 1) + '][0][0][0]'),
+          lev: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0:' + (this.dimensions.lev - 1) + '][0][0]'),
+          lat: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0][0:' + (this.dimensions.lat - 1) + '][0]'),
+          lon: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0][0][0:' + (this.dimensions.lon - 1) + ']'),
         });
       })
       .then(axes => {
