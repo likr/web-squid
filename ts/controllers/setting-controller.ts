@@ -41,7 +41,8 @@ export class SettingController {
           date: new Date(d.YEAR, d.MONTH - 1, d.DAY),
           cpue: +d.CPUE,
           hm0: ignore(+d.HM),
-          hmg0: ignore(+d.HMg),
+          hmgrad0: ignore(+d.HMg),
+          mld0: ignore(+d.MLD),
         };
         ['S', 'T', 'U', 'V', 'W'].forEach(v => {
           var i;

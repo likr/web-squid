@@ -41,6 +41,8 @@ export function SITabController(
     {value: 'v', name: 'Horizontal Velocity (Lat.)'},
     {value: 'w', name: 'Vertical Velocity'},
     {value: 'hm', name: 'Sea Surface Height'},
+    {value: 'hmgrad', name: 'Sea Surface Height (grad)'},
+    {value: 'mld', name: 'MLD'},
   ];
 
   $scope.saveSI = () => {
