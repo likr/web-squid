@@ -32,7 +32,10 @@ export function HSITabController(
       $('.col-xs-3').width());
   SIMapRenderer.drawParticles();
 
-  var distributionRenderer = new DistributionRenderer('#scatter-plot-graph2');
+  var distributionRenderer = new DistributionRenderer(
+      '#scatter-plot-graph2',
+      $('.col-xs-3').width(),
+      $('.col-xs-3').width());
 
   if (SIManager.SIs.length > 0) {
     $scope.selectedSI = SIManager.SIs[0];
