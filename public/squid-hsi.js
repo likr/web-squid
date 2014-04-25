@@ -667,7 +667,7 @@ var squid;
         function MapRenderer() {
             var _this = this;
             var lonW = 180;
-            var lonE = 189;
+            var lonE = 200;
             var latS = 34;
             var latN = 46;
             var xRange = {
