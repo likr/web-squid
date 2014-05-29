@@ -15,30 +15,9 @@ gds.xml with the file gds.xml.reference.
 
   <catalog temp_size_limit="0">
     <data>
-      <dataset name = "s"
-               file = "data/S/S3D_intpo.ctl"
-	             format = "ctl">
-      </dataset>
-      <dataset name = "t"
-               file = "data/T/T3D_intpo.ctl"
-               format = "ctl">
-      </dataset>
-      <dataset name = "u"
-               file = "data/U/U3D_intpo.ctl"
-               format = "ctl">
-      </dataset>
-      <dataset name = "v"
-               file = "data/V/V3D_intpo.ctl"
-               format = "ctl">
-      </dataset>
-      <dataset name = "w"
-               file = "data/W/W3D_intpo.ctl"
-               format = "ctl">
-      </dataset>
-      <dataset name = "hm"
-               file = "data/HM/HM_intpo.ctl"
-               format = "ctl">
-      </dataset>
+{% for datum in data %}
+      <dataset name="{{datum['name']}}" file="{{datum['file']}}" format="ctl"/>
+{% endfor %}
     </data>
   </catalog>
 
