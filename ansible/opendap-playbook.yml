@@ -1,57 +1,38 @@
 - hosts: all
-  vars:
-    proxy_env:
-      http_proxy:
-      https_proxy:
-      ftp_proxy:
-    gds_env:
-      GADDIR: /usr/share/grads/
-  sudo: yes
+  handlers:
+    - name: restart iptables
+      service: name=iptables state=restarted
+
+    - name: restart tomcat
+      service: name=tomcat6 enabled=yes state=restarted
+
+    - name: restart httpd
+      service: name=httpd enabled=yes state=restarted
   tasks:
-    # 1. java1.5 から 1.6にする
-    # 2. ansible/gds.xml のdatasetのfileのパスを書き換える。(デフォルトは/var/lib/gds-2.0/data/S etc)
-
-
-    # FIXME: 問題があれば80だけなど
-    - name: stop iptables
-      service: name=iptables state=stopped
-
-
     - name: fetch epel rpm
-      get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-5-4.noarch.rpm
+      get_url: url=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/x86_64/epel-release-6-8.noarch.rpm dest=/tmp/epel-release-6-8.noarch.rpm
       environment: proxy_env
 
     - name: install epel
-      yum: name=/tmp/epel-release-5-4.noarch.rpm state=present
+      yum: name=/tmp/epel-release-6-8.noarch.rpm state=present
       environment: proxy_env
 
-    - name: install libselinux-python
-      yum: name=libselinux-python
+    - name: install packages from yum
+      yum: name={{item}} state=installed
       environment: proxy_env
-
-    - name: install unzip
-      yum: name=unzip
-      environment: proxy_env
+      with_items:
+        - libselinux-python
+        - unzip
 
 
     # Tomcat6
     - name: install tomcat6
       yum: name=tomcat6
+      notify: restart tomcat
+      environment: proxy_env
 
-    - name: install tomcat6-webapps
-      yum: name=tomcat6-webapps
-
-    - name: install tomcat6-admin-webapps
-      yum: name=tomcat6-admin-webapps
-
-    - name: add tomcat.sh
-      copy: src=tomcat.sh dest=/etc/profile.d/tomcat.sh
-
-    - name: source tomcat.sh
-      action: shell source /etc/profile.d/tomcat.sh
-
-    - name: add dods
-      copy: src=dods.war dest=/var/lib/tomcat6/webapps/dods.war
+    - name: add tomcat options
+      copy: src=tomcat6.conf dest=/etc/tomcat6/tomcat6.conf backup=yes
 
 
     # GDS
@@ -66,29 +47,30 @@
     - name: unarchive GDS
       command: tar -xzf gds-2.0.tar.gz -C /var/lib/ chdir=/tmp creates=/var/lib/gds-2.0
 
-    - name: add gds.xml
-      copy: src=gds.xml dest=/var/lib/gds-2.0/gds.xml
+    - name: install dods
+      command: cp -r /var/lib/gds-2.0/tomcat4/webapps/dods /var/lib/tomcat6/webapps/dods creates=/var/lib/tomcat6/webapps/dods
+      notify: restart tomcat
 
-    - name: add jetty-gds.xml
-      copy: src=jetty-gds.xml dest=/var/lib/gds-2.0/jetty4/jetty-gds.xml
+    - name: add gds.xml
+      template: src=templates/gds.xml dest=/var/lib/gds-2.0/gds.xml mode=644 backup=yes
+      notify: restart tomcat
 
 
     # apache
     - name: install httpd
       yum: name=httpd state=present
+      notify: restart httpd
       environment: proxy_env
 
     - name: add proxy_ajp settings
-      copy: src=proxy_ajp.conf dest=/etc/httpd/conf.d/proxy_ajp.conf
+      copy: src=proxy_ajp.conf dest=/etc/httpd/conf.d/proxy_ajp.conf backup=yes
+      notify: restart httpd
 
     - name: add cors settings
-      copy: src=cors.conf dest=/etc/httpd/conf.d/cors.conf
+      copy: src=cors.conf dest=/etc/httpd/conf.d/cors.conf backup=yes
+      notify: restart httpd
 
-
-    # restart
-    - name: restart tomcat
-      service: name=tomcat6 enabled=yes state=restarted
-
-    - name: restart httpd
-      service: name=httpd enabled=yes state=restarted
-
+    - name: insert iptables rule
+      lineinfile: dest=/etc/sysconfig/iptables state=present regexp="80"
+                  insertafter="^:OUTPUT " line="-A INPUT -p tcp --dport 80 -j ACCEPT"
+      notify: restart iptables
