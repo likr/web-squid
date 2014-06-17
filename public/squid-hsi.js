@@ -993,6 +993,7 @@ var squid;
             this.lonFrom = 180;
             this.lonTo = 200;
             this.depthMax = 30;
+            this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
         }
         SettingController.prototype.start = function () {
             var _this = this;
@@ -1040,6 +1041,7 @@ var squid;
                 });
             };
             reader.readAsText(file);
+            localStorage.setItem('opendapEndpoint', this.opendapEndpoint);
         };
         SettingController.$inject = ['$scope', '$state', 'DataManager'];
         return SettingController;
