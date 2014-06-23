@@ -1,0 +1,27 @@
+{
+  "name": "web-squid",
+  "version": "0.0.0",
+  "description": "",
+  "main": "public/web-squid.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://likr@github.com/likr/web-squid.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/likr/web-squid/issues"
+  },
+  "homepage": "https://github.com/likr/web-squid",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-typescript": "~0.3.7"
+  }
+}

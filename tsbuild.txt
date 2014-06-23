@@ -1,1 +1,0 @@
---target ES5 --out public/squid-hsi.js ts/squid-hsi.ts
