@@ -1,4 +1,3 @@
-/// <reference path="typings/d3/d3.d.ts"/>
 var spline;
 (function (spline) {
     function quincunx(u, v, w, q) {
@@ -214,7 +213,6 @@ var spline;
     }
     spline.correlation = correlation;
 })(spline || (spline = {}));
-/// <reference path="spline.ts"/>
 var squid;
 (function (squid) {
     var SI = (function () {
@@ -310,8 +308,6 @@ var squid;
     })();
     squid.SIManager = SIManager;
 })(squid || (squid = {}));
-/// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
 var squid;
 (function (squid) {
     var DataManager = (function () {
@@ -354,7 +350,7 @@ var squid;
                     var file = v;
                 }
                 var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
-                loadData(dataUrl, function (data) {
+                jqdap.loadData(dataUrl, this.jqdapOptions()).then(function (data) {
                     deferred.resolve(_this.dataCache[key] = data);
                 });
             }
@@ -416,7 +412,7 @@ var squid;
 
         DataManager.prototype.loadDataset = function (url) {
             var deferred = this.$q.defer();
-            loadDataset(url, function (result) {
+            jqdap.loadDataset(url, this.jqdapOptions()).then(function (result) {
                 deferred.resolve(result);
             });
             return deferred.promise;
@@ -424,7 +420,7 @@ var squid;
 
         DataManager.prototype.loadData = function (url) {
             var deferred = this.$q.defer();
-            loadData(url, function (result) {
+            jqdap.loadData(url, this.jqdapOptions()).then(function (result) {
                 deferred.resolve(result);
             });
             return deferred.promise;
@@ -436,16 +432,23 @@ var squid;
             var x = Math.floor((date.getTime() - baseDate.getTime()) / 86400000) + 719164;
             return Math.min(d3.bisectLeft(axis, x), axis.length - 1);
         };
+
+        DataManager.prototype.jqdapOptions = function () {
+            if (this.username || this.password) {
+                return {
+                    withCredentials: true,
+                    username: this.username,
+                    password: this.password
+                };
+            } else {
+                return {};
+            }
+        };
         DataManager.$inject = ['$q'];
         return DataManager;
     })();
     squid.DataManager = DataManager;
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../typings/d3/d3.d.ts"/>
-/// <reference path="../typings/jquery/jquery.d.ts"/>
-/// <reference path="../data-manager.ts"/>
-/// <reference path="../spline.ts"/>
 var squid;
 (function (squid) {
     var nInterval = 100;
@@ -574,12 +577,6 @@ var squid;
     squid.DistributionRendererFactory = DistributionRendererFactory;
     DistributionRendererFactory.$inject = ['DataManager'];
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../typings/d3/d3.d.ts"/>
-/// <reference path="../typings/jquery/jquery.d.ts"/>
-/// <reference path="../typings/threejs/three.d.ts"/>
-/// <reference path="../data-manager.ts"/>
-/// <reference path="../si-manager.ts"/>
 var squid;
 (function (squid) {
     var IGNORE_VALUE = -999000000;
@@ -617,7 +614,6 @@ var squid;
             _createTriagle([vList[0], vList[3], vList[2]], [cList[0], cList[3], cList[2]]);
         };
 
-        // num to color
         var extents = values.map(function (row) {
             return d3.extent(row.filter(function (v) {
                 return v != IGNORE_VALUE;
@@ -682,20 +678,16 @@ var squid;
             var height = yRange.max - yRange.min;
             var aspectRatio = height / width;
 
-            // initialize renderer
             this.renderer = new THREE.WebGLRenderer();
             this.renderer.setClearColor(0xffffff, 1.0);
 
-            // initialize camera
             var camerax = (xRange.max + xRange.min) / 2, cameray = (yRange.max + yRange.min) / 2;
             var camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 2);
             camera.position.set(camerax, cameray, 1);
             camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
 
-            // initialize scene
             this.scene = new THREE.Scene();
 
-            // render
             var render = function () {
                 requestAnimationFrame(render);
                 _this.renderer.render(_this.scene, camera);
@@ -873,10 +865,6 @@ var squid;
     squid.MapRendererFactory = MapRendererFactory;
     MapRendererFactory.$inject = ['$q', 'DataManager'];
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../si-manager.ts"/>
-/// <reference path="../views/distribution-view.ts"/>
-/// <reference path="../views/map-view.ts"/>
 var squid;
 (function (squid) {
     function HSITabController($scope, SIManager, DistributionRenderer, SIMapRenderer, HSIMapRenderer) {
@@ -957,9 +945,6 @@ var squid;
         'HSIMapRenderer'
     ];
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../data-manager.ts"/>
-/// <reference path="../si-manager.ts"/>
 var squid;
 (function (squid) {
     function MainController($scope, DataManager, SIManager) {
@@ -974,9 +959,6 @@ var squid;
         'SIManager'
     ];
 })(squid || (squid = {}));
-/// <reference path="../typings/d3/d3.d.ts"/>
-/// <reference path="../typings/jquery/jquery.d.ts"/>
-/// <reference path="../data-manager.ts"/>
 var squid;
 (function (squid) {
     var SettingController = (function () {
@@ -984,7 +966,6 @@ var squid;
             this.$scope = $scope;
             this.$state = $state;
             this.DataManager = DataManager;
-            this.opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
             this.predictionDate = new Date(2013, 6, 1);
             this.cpueFrom = new Date(1999, 0, 1);
             this.cpueTo = new Date(2013, 11, 31);
@@ -994,6 +975,7 @@ var squid;
             this.lonTo = 200;
             this.depthMax = 30;
             this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
+            this.username = localStorage.getItem('username');
         }
         SettingController.prototype.start = function () {
             var _this = this;
@@ -1036,22 +1018,21 @@ var squid;
                 _this.DataManager.cpueDateFrom = _this.cpueFrom;
                 _this.DataManager.cpueDateTo = _this.cpueTo;
                 _this.DataManager.opendapEndpoint = _this.opendapEndpoint;
+                _this.DataManager.username = _this.username;
+                _this.DataManager.password = _this.password;
                 _this.DataManager.initialize(data, _this.opendapEndpoint).then(function () {
                     _this.$state.go('main.si');
                 });
             };
             reader.readAsText(file);
             localStorage.setItem('opendapEndpoint', this.opendapEndpoint);
+            localStorage.setItem('username', this.username);
         };
         SettingController.$inject = ['$scope', '$state', 'DataManager'];
         return SettingController;
     })();
     squid.SettingController = SettingController;
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../typings/d3/d3.d.ts"/>
-/// <reference path="../data-manager.ts"/>
-/// <reference path="../spline.ts"/>
 var squid;
 (function (squid) {
     var svgMargin = 20;
@@ -1172,11 +1153,6 @@ var squid;
     squid.CorrelationRendererFactory = CorrelationRendererFactory;
     CorrelationRendererFactory.$inject = ['DataManager'];
 })(squid || (squid = {}));
-/// <reference path="../typings/angularjs/angular.d.ts"/>
-/// <reference path="../si-manager.ts"/>
-/// <reference path="../views/correlation-view.ts"/>
-/// <reference path="../views/distribution-view.ts"/>
-/// <reference path="../views/map-view.ts"/>
 var squid;
 (function (squid) {
     function SITabController($scope, SIManager, CorrelationRenderer, DistributionRenderer, variableMapRenderer, SIMapRenderer) {
@@ -1285,18 +1261,6 @@ var squid;
         'SIMapRenderer'
     ];
 })(squid || (squid = {}));
-/// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="typings/angularjs/angular.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
-/// <reference path="controllers/hsi-tab-controller.ts"/>
-/// <reference path="controllers/main-controller.ts"/>
-/// <reference path="controllers/setting-controller.ts"/>
-/// <reference path="controllers/si-tab-controller.ts"/>
-/// <reference path="views/correlation-view.ts"/>
-/// <reference path="views/distribution-view.ts"/>
-/// <reference path="views/map-view.ts"/>
-/// <reference path="data-manager.ts"/>
-/// <reference path="si-manager.ts"/>
 var squid;
 (function (squid) {
     squid.app = angular.module('squid-hsi', ['ui.router', 'ui.bootstrap']).factory('d3get', [
