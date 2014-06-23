@@ -46,3 +46,5 @@ VARS
 public/squid-hsi.js
 data/AMSJGCPUE1999-2012SAFcl2_move
 data/nfsquid2013summer_r2_move
+
+node_modules

@@ -1,0 +1,26 @@
+{
+  "name": "jqdap",
+  "main": "jqdap.js",
+  "version": "0.0.0",
+  "authors": [
+    "Yosuke ONOUE <onoue@likr-lab.com>"
+  ],
+  "description": "jQuery.ajax based OPeNDAP client",
+  "license": "MIT",
+  "homepage": "https://github.com/likr/jqdap",
+  "ignore": [
+    "**/.*",
+    "js",
+    "src",
+    "lib",
+    "example",
+    "Gruntfile.coffee",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1"
+  }
+}

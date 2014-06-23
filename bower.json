@@ -22,6 +22,7 @@
     "d3": "~3.4.2",
     "threejs": "*",
     "angular-ui-router": "~0.2.10",
-    "angular-ui-bootstrap-bower": "~0.10.0"
+    "angular-ui-bootstrap-bower": "~0.10.0",
+    "jqdap": "*"
   }
 }

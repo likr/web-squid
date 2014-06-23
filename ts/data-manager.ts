@@ -1,5 +1,5 @@
 /// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
+/// <reference path="lib/jqdap.d.ts"/>
 
 module squid {
 export class DataManager {
@@ -15,6 +15,8 @@ export class DataManager {
   public lonStop = 671;
   public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
+  public username: string;
+  public password: string;
   private dataCache = {};
   private dimensions;
   private axes;
@@ -50,9 +52,10 @@ export class DataManager {
         var file = v;
       }
       var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
-      loadData(dataUrl, data => {
-        deferred.resolve(this.dataCache[key] = data);
-      });
+      jqdap.loadData(dataUrl, this.jqdapOptions())
+        .then(data => {
+          deferred.resolve(this.dataCache[key] = data);
+        });
     }
     return deferred.promise;
   }
@@ -112,17 +115,19 @@ export class DataManager {
 
   private loadDataset(url : string) {
     var deferred = this.$q.defer();
-    loadDataset(url, result => {
-      deferred.resolve(result);
-    });
+    jqdap.loadDataset(url, this.jqdapOptions())
+      .then(result => {
+        deferred.resolve(result);
+      });
     return deferred.promise;
   }
 
   private loadData(url : string) {
     var deferred = this.$q.defer();
-    loadData(url, result => {
-      deferred.resolve(result);
-    });
+    jqdap.loadData(url, this.jqdapOptions())
+      .then(result => {
+        deferred.resolve(result);
+      });
     return deferred.promise;
   }
 
@@ -131,6 +136,18 @@ export class DataManager {
     var baseDate = new Date(1970, 0, 1);
     var x = Math.floor((date.getTime() - baseDate.getTime()) / 86400000) + 719164;
     return Math.min(d3.bisectLeft(axis, x), axis.length - 1);
+  }
+
+  private jqdapOptions(): jqdap.AjaxOptions {
+    if (this.username || this.password) {
+      return {
+        withCredentials: true,
+        username: this.username,
+        password: this.password,
+      };
+    } else {
+      return {};
+    }
   }
 }
 }
