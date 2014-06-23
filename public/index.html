@@ -8,17 +8,27 @@
 <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css"/>
 <link rel="stylesheet" href="squid-hsi.css"/>
 </head>
-<body ng-app="squid-hsi" style="background-color: #dbf1c8; overflow-y: hidden">
-<div class="container" style="background-color: white;" ng-view>
+<body ng-app="squid-hsi">
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">HSI Modeling Tool</a>
+  </div>
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+  </div>
+  <div ui-view></div>
 </div>
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
 <script src="bower_components/angular/angular.min.js"></script>
-<script src="bower_components/angular-route/angular-route.min.js"></script>
-<script src="bower_components/angular-ui-date/src/date.js"></script>
+<script src="bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min.js"></script>
+<script src="bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
 <script src="bower_components/d3/d3.min.js"></script>
 <script src="bower_components/threejs/build/three.min.js"></script>
-<script src="jsdap-1.0.0.js"></script>
+<script src="bower_components/jqdap/jqdap.js"></script>
 <script src="squid-hsi.js"></script>
 </body>
 </html>

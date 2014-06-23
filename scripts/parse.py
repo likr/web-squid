@@ -62,14 +62,14 @@ def load_var(x, y, data, points, depth):
 def load_row(row):
     y, x = float(row[8]), float(row[9])
     cpue = float(row[44])
-    startDate = datetime.strptime(row[4], '%m/%d/%Y %H:%M')
     date = datetime.strptime(row[5], '%m/%d/%Y %H:%M')
     o = Row(x, y, date)
     o.data.append(cpue)
     o.data.append(x)
     o.data.append(y)
-    o.data.append(startDate.strftime('%d %b %Y %H:%M:%S GMT+0900'))
-    o.data.append(date.strftime('%d %b %Y %H:%M:%S GMT+0900'))
+    o.date.append(date.year)
+    o.date.append(date.month)
+    o.date.append(date.day)
     return o
 
 
@@ -97,7 +97,7 @@ def main():
     variables_2d = ['HM']
     variables = variables_3d + variables_2d
     depths = range(54)
-    labels = ['cpue', 'x', 'y', 'startDate', 'stopDate']
+    labels = ['CPUE', 'LON', 'LAT', 'YEAR', 'MONTH', 'DAY']
     rows = list(csv.reader(open('cpue.csv')))
     data = [load_row(row) for row in rows[1:]]
     data = [o for o in data if
@@ -123,7 +123,8 @@ def main():
                 load_var(x, y, values, points, depth)
                 if v == 'HM':
                     break
-    labels.extend('{0}{1}'.format(v, d) for v in variables_3d for d in depths)
+    labels.\
+        extend('{0}{1:02}'.format(v, d) for v in variables_3d for d in depths)
     labels.extend('{0}0'.format(v) for v in variables_2d)
     writer = csv.writer(open('cpue-var.csv', 'w'))
     writer.writerow(labels)

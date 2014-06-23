@@ -1,124 +1,19 @@
-<div class="row" style="margin-top: 20px; margin-bottom: 20px; height: 600px;">
-  <div class="col-xs-4" style="height:100%;">
-    <div style="height: 60px;">
-      <h1 style="margin-top: 0; text-align: center;">HSI Modeling Tool</h1>
-    </div>
-    <div style="padding: 10px; border: solid; border-radius: 10px; border-width: 1px; border-color: #ddd; background-color: white; height: 540px;">
-      <div  ng-controller="MapController">
-        <div id="stage"></div>
-        <form class="form">
-          <label>View</label>
-          <div>
-            <label class="radio-inline"><input type="radio" ng-model="view" value="variable"/>Variable</label>
-            <label class="radio-inline"><input type="radio" ng-model="view" value="si"/>SI</label>
-            <label class="radio-inline"><input type="radio" ng-model="view" value="hsi"/>HSI</label>
-            <label class="radio-inline"><input type="radio" ng-model="view" value="none"/>None</label>
-          </div>
-          <label>CPUE Point</label>
-          <div>
-            <label class="checkbox-inline"><input type="checkbox" ng-model="showWholeCPUE"/>Show whole CPUE</label>
-            <label class="checkbox-inline"><input type="checkbox" ng-model="showExpectedCPUE"/>Show expected CPUE</label>
-          </div>
-        </form>
+<div class="row">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label class="col-xs-2 control-label">Target Date</label>
+      <div class="col-xs-10">
+        <input class="form-control" ng-model="DataManager.selectedDate" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
       </div>
     </div>
-  </div>
-  <div class="col-xs-4" style="height:100%;">
-    <div class="row">
-      <form class="form" style="border: solid; border-radius: 10px; border-width: 1px; border-color: #ddd; background-color: white; height: 100px;">
-        <div class="row" style="padding: 10px;">
-          <div class="form-group col-xs-4">
-            <label>MOVE Date</label>
-            <input class="form-control" ui-date ng-model="selectedDate"/>
-          </div>
-          <div class="form-group col-xs-4">
-            <label>CPUE From</label>
-            <input class="form-control" ui-date ng-model="cpueDateFrom"/>
-          </div>
-          <div class="form-group col-xs-4">
-            <label>CPUE To</label>
-            <input class="form-control" ui-date ng-model="cpueDateTo"/>
-          </div>
-        </div>
-      </form>
-      <form class="form" style="border: solid; border-radius: 10px; border-width: 1px; border-color: #ddd; margin-top: 10px; background-color: white; height: 490px;">
-        <div style="padding: 10px;">
-          <div class="form-group">
-            <label>Variables</label>
-            <div>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="S"/>{{'S' | variableName}}</label>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="T"/>{{'T' | variableName}}</label>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="HM"/>{{'HM' | variableName}}</label>
-            </div>
-            <div>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="U"/>{{'U' | variableName}}</label>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="V"/>{{'V' | variableName}}</label>
-            </div>
-            <div>
-              <label class="radio-inline"><input type="radio" ng-model="selectedVariable" value="W"/>{{'W' | variableName}}</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="row">
-              <div class="col-xs-6">
-                <label>Depth</label>
-                <div ng-controller="DepthRelationController">
-                  <svg id="depth-relation"></svg>
-                </div>
-                <div>
-                  <button class="btn btn-default col-xs-3" ng-click="decrementDepth()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-                  <span class="col-xs-6 text-center">{{selectedDepth}}</span>
-                  <button class="btn btn-default col-xs-3" ng-click="incrementDepth()"><span class="glyphicon glyphicon-arrow-right"></span></button>
-                </div>
-                <input type="range" ng-model="selectedDepth" min="{{depthMin}}" max="{{depthMax}}" required/>
-              </div>
-              <div class="col-xs-6">
-                <label>Smoothing Parameter</label>
-                <div ng-controller="DistributionController">
-                  <svg id="distribution"></svg>
-                </div>
-                <div>
-                  <button class="btn btn-default col-xs-3" ng-click="decrementLambda()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-                  <span class="col-xs-6 text-center">{{lambda}}</span>
-                  <button class="btn btn-default col-xs-3" ng-click="incrementLambda()"><span class="glyphicon glyphicon-arrow-right"></span></button>
-                </div>
-                <input type="range" ng-model="lambda" min="0.001" max="1" step="0.001" required/>
-              </div>
-            </div>
-          </div>
-          <div class="row" style="margin-top: 10px;">
-            <div class="col-xs-6 col-xs-offset-3">
-              <button class="btn btn-default btn-lg btn-block" ng-click="saveSI()">Save SI</button>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-  <div class="col-xs-4" style="height:100%;">
-    <div ng-controller="SIController" style="height: 600px; overflow-y: scroll; background-color: white;">
-      <table class="table table-bordered" style="margin-bottom: 0;">
-        <tr>
-          <th class="col-xs-2">Use</th>
-          <th class="col-xs-7">Variable - Depth - Smoothing Parameter</th>
-          <th class="col-xs-3">Action</th>
-        </tr>
-        <tr ng-repeat="SI in SIs" style="height: 70px;">
-          <td><input type="checkbox" ng-model="SI.active"/></td>
-          <td>{{SI.variable | variableName}} - {{SI.depth}} - {{SI.lambda}}</td>
-          <td>
-            <button class="btn btn-default btn-xs btn-block" ng-click="loadSI(SI)">Load</button>
-            <button class="btn btn-default btn-xs btn-block" ng-click="removeSI($index)">Remove</button>
-          </td>
-        </tr>
-        <tr style="height: 70px;" ng-repeat="dummy in SIPaddings">
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      </table>
-    </div>
-  </div>
+  </form>
 </div>
-<div class="row" style="height: 300px; background-color: #f8fef1">
-</div>
+<ul class="nav nav-tabs nav-justified">
+  <li ui-sref-active="active">
+    <a ui-sref="main.si">SI</a>
+  </li>
+  <li ui-sref-active="active">
+    <a ui-sref="main.hsi">HSI({{SIs.length}})</a>
+  </li>
+</ul>
+<div ui-view></div>

@@ -1,5 +1,4 @@
-#stage {
-    width: 100%;
+#variable-map canvas, #si-map canvas {
     border: 1px solid #ccc;
 }
 

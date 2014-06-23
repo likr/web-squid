@@ -1,0 +1,27 @@
+{
+  "name": "jqdap",
+  "version": "0.0.0",
+  "description": "jQuery.ajax based OPeNDAP client",
+  "main": "jqdap.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/likr/jqdap.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/likr/jqdap/issues"
+  },
+  "homepage": "https://github.com/likr/jqdap",
+  "devDependencies": {
+    "grunt-cli": "~0.1.13",
+    "grunt": "~0.4.5",
+    "grunt-contrib-coffee": "~0.10.1",
+    "grunt-contrib-watch": "~0.6.1",
+    "browserify": "~4.1.10",
+    "grunt-browserify": "~2.1.0"
+  }
+}

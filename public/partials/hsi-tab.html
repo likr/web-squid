@@ -1,0 +1,30 @@
+<div class="row" ng-class="HSITabController">
+  <div class="col-xs-4 col-xs-offset-1">
+    <h2>HSI Map</h2>
+    <div id="hsi-map"></div>
+    <h2>SI Map</h2>
+    <div id="si-map2"></div>
+  </div>
+  <div class="col-xs-3">
+    <h2>Scatter Plot Graph</h2>
+    <div id="scatter-plot-graph2"></div>
+  </div>
+  <div class="col-xs-3">
+    <h2>SI Curves</h2>
+    <table class="table table-bordered" style="margin-bottom: 0;">
+      <tr>
+        <th class="col-xs-2">Use</th>
+        <th class="col-xs-7">Variable - Depth - Smoothing Parameter</th>
+        <th class="col-xs-3">Action</th>
+      </tr>
+      <tr ng-repeat="SI in SIs" ng-class="{'success': SI == selectedSI}">
+        <td ng-click="check(SI)"><input type="checkbox" ng-model="SI.active"/></td>
+        <td ng-click="check(SI)" style="cursor: pointer;">{{SI.variableName}} - {{SI.depthIndex}} - {{SI.lambda}}</td>
+        <td>
+          <button class="btn btn-default btn-xs btn-block" ng-click="select(SI)">Show</button>
+          <a class="btn btn-default btn-xs btn-block" download="{{SI.variableName}}-{{SI.depthIndex}}-{{SI.lambda}}.txt" ng-href="{{export(SI)}}">Export</a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
