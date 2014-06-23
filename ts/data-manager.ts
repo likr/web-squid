@@ -1,5 +1,5 @@
 /// <reference path="typings/d3/d3.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
+/// <reference path="lib/jqdap.d.ts"/>
 
 module squid {
 export class DataManager {
@@ -50,9 +50,10 @@ export class DataManager {
         var file = v;
       }
       var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
-      loadData(dataUrl, data => {
-        deferred.resolve(this.dataCache[key] = data);
-      });
+      jqdap.loadData(dataUrl)
+        .then(data => {
+          deferred.resolve(this.dataCache[key] = data);
+        });
     }
     return deferred.promise;
   }
@@ -112,17 +113,19 @@ export class DataManager {
 
   private loadDataset(url : string) {
     var deferred = this.$q.defer();
-    loadDataset(url, result => {
-      deferred.resolve(result);
-    });
+    jqdap.loadDataset(url)
+      .then(result => {
+        deferred.resolve(result);
+      });
     return deferred.promise;
   }
 
   private loadData(url : string) {
     var deferred = this.$q.defer();
-    loadData(url, result => {
-      deferred.resolve(result);
-    });
+    jqdap.loadData(url)
+      .then(result => {
+        deferred.resolve(result);
+      });
     return deferred.promise;
   }
 

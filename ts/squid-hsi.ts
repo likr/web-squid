@@ -1,6 +1,6 @@
 /// <reference path="typings/d3/d3.d.ts"/>
 /// <reference path="typings/angularjs/angular.d.ts"/>
-/// <reference path="lib/jsdap.d.ts"/>
+/// <reference path="lib/jqdap.d.ts"/>
 /// <reference path="controllers/hsi-tab-controller.ts"/>
 /// <reference path="controllers/main-controller.ts"/>
 /// <reference path="controllers/setting-controller.ts"/>
