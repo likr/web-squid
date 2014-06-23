@@ -15,6 +15,8 @@ export class DataManager {
   public lonStop = 671;
   public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
+  public username: string;
+  public password: string;
   private dataCache = {};
   private dimensions;
   private axes;
@@ -50,7 +52,7 @@ export class DataManager {
         var file = v;
       }
       var dataUrl = this.opendapEndpoint + file + '.dods?' + query;
-      jqdap.loadData(dataUrl)
+      jqdap.loadData(dataUrl, this.jqdapOptions())
         .then(data => {
           deferred.resolve(this.dataCache[key] = data);
         });
@@ -113,7 +115,7 @@ export class DataManager {
 
   private loadDataset(url : string) {
     var deferred = this.$q.defer();
-    jqdap.loadDataset(url)
+    jqdap.loadDataset(url, this.jqdapOptions())
       .then(result => {
         deferred.resolve(result);
       });
@@ -122,7 +124,7 @@ export class DataManager {
 
   private loadData(url : string) {
     var deferred = this.$q.defer();
-    jqdap.loadData(url)
+    jqdap.loadData(url, this.jqdapOptions())
       .then(result => {
         deferred.resolve(result);
       });
@@ -134,6 +136,18 @@ export class DataManager {
     var baseDate = new Date(1970, 0, 1);
     var x = Math.floor((date.getTime() - baseDate.getTime()) / 86400000) + 719164;
     return Math.min(d3.bisectLeft(axis, x), axis.length - 1);
+  }
+
+  private jqdapOptions(): jqdap.AjaxOptions {
+    if (this.username || this.password) {
+      return {
+        withCredentials: true,
+        username: this.username,
+        password: this.password,
+      };
+    } else {
+      return {};
+    }
   }
 }
 }

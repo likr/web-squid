@@ -2,9 +2,9 @@
 
 declare module jqdap {
 interface AjaxOptions {
-  username: string;
-  password: string;
-  withCredentials: boolean;
+  username?: string;
+  password?: string;
+  withCredentials?: boolean;
 }
 
 function loadData(url: string, options?: AjaxOptions): JQueryXHR;

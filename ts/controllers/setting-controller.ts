@@ -5,7 +5,7 @@
 module squid {
 export class SettingController {
   static $inject = ['$scope', '$state', 'DataManager'];
-  private opendapEndpoint = 'http://priusa.yes.jamstec.go.jp/opendap/';
+  private opendapEndpoint: string;
   private predictionDate = new Date(2013, 6, 1);
   private cpueFrom = new Date(1999, 0, 1);
   private cpueTo = new Date(2013, 11, 31);
@@ -14,9 +14,12 @@ export class SettingController {
   private lonFrom = 180;
   private lonTo = 200;
   private depthMax = 30;
+  private username: string;
+  private password: string;
 
   constructor(private $scope, private $state, private DataManager) {
     this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
+    this.username = localStorage.getItem('username');
   }
 
   start() {
@@ -59,6 +62,8 @@ export class SettingController {
       this.DataManager.cpueDateFrom = this.cpueFrom;
       this.DataManager.cpueDateTo = this.cpueTo;
       this.DataManager.opendapEndpoint = this.opendapEndpoint;
+      this.DataManager.username = this.username;
+      this.DataManager.password = this.password;
       this.DataManager
         .initialize(data, this.opendapEndpoint)
         .then(() => {
@@ -67,6 +72,7 @@ export class SettingController {
     };
     reader.readAsText(file);
     localStorage.setItem('opendapEndpoint', this.opendapEndpoint);
+    localStorage.setItem('username', this.username);
   }
 }
 }
