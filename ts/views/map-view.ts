@@ -103,10 +103,10 @@ export class MapRenderer {
   private DataManager : DataManager;
 
   constructor() {
-    var lonW = 180;
-    var lonE = 200;
-    var latS = 34;
-    var latN = 46;
+    var lonW = 140;
+    var lonE = 148;
+    var latS = 35;
+    var latN = 43;
     var xRange = {
       min: lonToX(lonW),
       max: lonToX(lonE),

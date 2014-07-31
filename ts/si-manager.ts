@@ -1,4 +1,5 @@
 /// <reference path="spline.ts"/>
+/// <reference path="data-manager.ts"/>
 
 module squid {
 export class SI {
@@ -6,7 +7,7 @@ export class SI {
   public interpolator;
   private scale;
 
-  constructor(private CPUEs, private variableName_ : string, private depthIndex_ : number, private lambda_ : number) {
+  constructor(private CPUEs, private variableName_ : string, private timeIndex_ : number, private depthIndex_ : number, private lambda_ : number) {
     this.interpolate();
   }
 
@@ -16,6 +17,15 @@ export class SI {
 
   set variableName(value : string) {
     this.variableName_ = value;
+    this.interpolate();
+  }
+
+  get timeIndex(): number {
+    return this.timeIndex_;
+  }
+
+  set timeIndex(value: number) {
+    this.timeIndex_ = value;
     this.interpolate();
   }
 
@@ -53,7 +63,7 @@ export class SI {
   }
 
   private interpolate() {
-    var key = this.variableName_ + this.depthIndex_;
+    var key = DataManager.factorKey(this.variableName_, this.timeIndex_, this.depthIndex_);
     this.interpolator = spline.interpolator(
         this.CPUEs,
         d => d[key],
@@ -73,8 +83,8 @@ export class SIManager {
   constructor(private DataManager) {
   }
 
-  createSI(variableName : string, depthIndex : number, lambda : number) {
-    return new SI(this.DataManager.CPUEPoints, variableName, depthIndex, lambda);
+  createSI(variableName : string, timeIndex : number, depthIndex : number, lambda : number) {
+    return new SI(this.DataManager.CPUEPoints, variableName, timeIndex, depthIndex, lambda);
   }
 
   registerSI(SI) {

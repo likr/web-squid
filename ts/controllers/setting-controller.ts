@@ -9,10 +9,10 @@ export class SettingController {
   private predictionDate = new Date(2013, 6, 1);
   private cpueFrom = new Date(1999, 0, 1);
   private cpueTo = new Date(2013, 11, 31);
-  private latFrom = 34;
-  private latTo = 46;
-  private lonFrom = 180;
-  private lonTo = 200;
+  private latFrom = 35;
+  private latTo = 43;
+  private lonFrom = 141;
+  private lonTo = 147;
   private depthMax = 30;
   private username: string;
   private password: string;
@@ -49,10 +49,12 @@ export class SettingController {
           mld0: ignore(+d.MLD),
         };
         ['S', 'T', 'U', 'V', 'W'].forEach(v => {
-          var i;
+          var i, j;
           for (i = 0; i < 54; ++i) {
-            var val = +d[v + ('0' + (i + 1)).slice(-2)]
-            obj[v.toLowerCase() + i] = ignore(val);
+            for (j = 0; j < 10; ++j) {
+              var key = DataManager.factorKey(v, j, i);
+              obj[key] = ignore(+d[key]);
+            }
           }
         });
         return obj;

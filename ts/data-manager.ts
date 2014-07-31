@@ -8,11 +8,11 @@ export class DataManager {
   public cpueDateFrom : Date;
   public cpueDateTo : Date;
   public opendapEndpoint : string;
-  public latStart = 192;
-  public latStop = 312;
+  public latStart = 202;
+  public latStop = 282;
   public latLength = this.latStop - this.latStart;
-  public lonStart = 551;
-  public lonStop = 671;
+  public lonStart = 242;
+  public lonStop = 302;
   public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
   public username: string;
@@ -107,6 +107,10 @@ export class DataManager {
 
   initialized() : boolean {
     return this.CPUEPoints !== undefined;
+  }
+
+  static factorKey(v: string, t: number, d: number): string {
+    return v + ('0' + (t + 1)).slice(-2) + ('0' + (d + 1)).slice(-2);
   }
 
   private key(variableName : string, date : Date, depthIndex : number) : string {

@@ -109,12 +109,12 @@ export class CorrelationRenderer {
       .call(yAxis);
   }
 
-  draw(variableName : string, lambda : number) {
+  draw(variableName: string, timeIndex: number, lambda: number) {
     var Rs = (() => {
       var Rs = [];
       var depth;
       for (depth = 0; depth <= maxDepth; ++depth) {
-        var key = variableName + depth;
+        var key = DataManager.factorKey(variableName, timeIndex, depth);
         var dat = this.cpuePoints.filter(d => d[key] != 0);
         var interpolator = spline.interpolator(
             dat,
