@@ -379,25 +379,12 @@ var squid;
 
         DataManager.prototype.initialize = function (CPUEPoints, opendapEndpoint) {
             var _this = this;
-            return this.loadDataset(this.opendapEndpoint + 'w').then(function (dataset) {
-                _this.dimensions = {
-                    time: dataset.time.shape[0],
-                    lev: dataset.lev.shape[0],
-                    lat: dataset.lat.shape[0],
-                    lon: dataset.lon.shape[0]
-                };
-                return _this.$q.all({
-                    time: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0:' + (_this.dimensions.time - 1) + '][0][0][0]'),
-                    lev: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0:' + (_this.dimensions.lev - 1) + '][0][0]'),
-                    lat: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0][0:' + (_this.dimensions.lat - 1) + '][0]'),
-                    lon: _this.loadData(_this.opendapEndpoint + 'w.dods?w[0][0][0][0:' + (_this.dimensions.lon - 1) + ']')
-                });
-            }).then(function (axes) {
+            return this.loadData(this.opendapEndpoint + 'w.dods?lat,lon,lev,time').then(function (data) {
                 _this.axes = {
-                    time: axes.time[0][1],
-                    lev: axes.lev[0][2],
-                    lat: axes.lat[0][3],
-                    lon: axes.lon[0][4]
+                    lat: data[3],
+                    lon: data[2],
+                    lev: data[1],
+                    time: data[0]
                 };
             });
         };
