@@ -79,30 +79,15 @@ export class DataManager {
   }
 
   initialize(CPUEPoints, opendapEndpoint : string) {
-    return this.loadDataset(this.opendapEndpoint + 'w')
-      .then(dataset => {
-        this.dimensions = {
-          time: dataset.time.shape[0],
-          lev: dataset.lev.shape[0],
-          lat: dataset.lat.shape[0],
-          lon: dataset.lon.shape[0],
-        };
-        return this.$q.all({
-          time: this.loadData(this.opendapEndpoint + 'w.dods?w[0:' + (this.dimensions.time - 1) + '][0][0][0]'),
-          lev: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0:' + (this.dimensions.lev - 1) + '][0][0]'),
-          lat: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0][0:' + (this.dimensions.lat - 1) + '][0]'),
-          lon: this.loadData(this.opendapEndpoint + 'w.dods?w[0][0][0][0:' + (this.dimensions.lon - 1) + ']'),
-        });
-      })
-      .then(axes => {
+    return this.loadData(this.opendapEndpoint + 'w.dods?lat,lon,lev,time')
+      .then(data => {
         this.axes = {
-          time: axes.time[0][1],
-          lev: axes.lev[0][2],
-          lat: axes.lat[0][3],
-          lon: axes.lon[0][4],
+          lat: data[3],
+          lon: data[2],
+          lev: data[1],
+          time: data[0],
         };
-      })
-      ;
+      });
   }
 
   initialized() : boolean {
