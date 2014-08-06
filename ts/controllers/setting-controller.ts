@@ -19,7 +19,7 @@ export class SettingController {
 
   constructor(private $scope, private $state, private DataManager) {
     this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
-    this.username = localStorage.getItem('username');
+    this.username = localStorage.getItem('username') || '';
   }
 
   start() {
