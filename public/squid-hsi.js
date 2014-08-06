@@ -962,7 +962,7 @@ var squid;
             this.lonTo = 200;
             this.depthMax = 30;
             this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
-            this.username = localStorage.getItem('username');
+            this.username = localStorage.getItem('username') || '';
         }
         SettingController.prototype.start = function () {
             var _this = this;
