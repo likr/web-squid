@@ -313,15 +313,9 @@ var squid;
     var DataManager = (function () {
         function DataManager($q) {
             this.$q = $q;
-            this.latStart = 192;
-            this.latStop = 312;
-            this.latLength = this.latStop - this.latStart;
-            this.lonStart = 551;
-            this.lonStop = 671;
-            this.lonLength = this.lonStop - this.lonStart;
             this.dataCache = {};
         }
-        DataManager.prototype.loadMOVE = function (variableName, depthIndex) {
+        DataManager.prototype.loadMOVE = function (variableName, depthIndex, region) {
             var _this = this;
             var deferred = this.$q.defer();
             var key = this.key(variableName, this.selectedDate, depthIndex);
@@ -331,8 +325,10 @@ var squid;
                 var v = variableName.toLowerCase();
                 var dateIndex = this.dateIndex(this.selectedDate);
                 var d = depthIndex;
-                var lat = this.latStart + ':' + this.latStop;
-                var lon = this.lonStart + ':' + this.lonStop;
+                var latRegion = this.region('lat', region.latFrom, region.latTo);
+                var lonRegion = this.region('lon', region.lonFrom, region.lonTo);
+                var lat = latRegion[0] + ':' + latRegion[1];
+                var lon = lonRegion[0] + ':' + lonRegion[1];
                 var query = v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
                 if (/fcst\d{4}/.test(this.opendapEndpoint)) {
                     switch (v) {
@@ -381,8 +377,8 @@ var squid;
             var _this = this;
             return this.loadData(this.opendapEndpoint + 'w.dods?lat,lon,lev,time').then(function (data) {
                 _this.axes = {
-                    lat: data[3],
-                    lon: data[2],
+                    lon: data[3],
+                    lat: data[2],
                     lev: data[1],
                     time: data[0]
                 };
@@ -411,6 +407,26 @@ var squid;
                 deferred.resolve(result);
             });
             return deferred.promise;
+        };
+
+        DataManager.prototype.region = function (name, min, max) {
+            var axis = this.axes[name];
+            var x0 = axis.length - 1;
+            for (var i = 0; i < axis.length; ++i) {
+                if (min < axis[i]) {
+                    x0 = Math.max(0, i - 1);
+                    break;
+                }
+            }
+            var x1 = 0;
+            for (var i = axis.length - 1; i > 0; --i) {
+                if (axis[i] < max) {
+                    x1 = Math.min(axis.length - 1, i + 1);
+                    break;
+                }
+            }
+
+            return [x0, x1];
         };
 
         DataManager.prototype.dateIndex = function (date) {
@@ -649,33 +665,39 @@ var squid;
     var MapRenderer = (function () {
         function MapRenderer() {
             var _this = this;
-            var lonW = 180;
-            var lonE = 200;
-            var latS = 34;
-            var latN = 46;
-            var xRange = {
-                min: lonToX(lonW),
-                max: lonToX(lonE)
-            };
-            var yRange = {
-                min: latToY(latS),
-                max: latToY(latN)
-            };
-            var width = xRange.max - xRange.min;
-            var height = yRange.max - yRange.min;
-            var aspectRatio = height / width;
-
             this.renderer = new THREE.WebGLRenderer();
             this.renderer.setClearColor(0xffffff, 1.0);
-
-            var camerax = (xRange.max + xRange.min) / 2, cameray = (yRange.max + yRange.min) / 2;
-            var camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 1, 2);
-            camera.position.set(camerax, cameray, 1);
-            camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
-
             this.scene = new THREE.Scene();
+            this.drawCoastLine();
+            var camera = new THREE.OrthographicCamera(-10, 10, 6, -6, 1, 2);
 
             var render = function () {
+                var xRange = {
+                    min: lonToX(MapRenderer.lonW),
+                    max: lonToX(MapRenderer.lonE)
+                };
+                var yRange = {
+                    min: latToY(MapRenderer.latS),
+                    max: latToY(MapRenderer.latN)
+                };
+                var width = xRange.max - xRange.min;
+                var height = yRange.max - yRange.min;
+                if (width * 3 / 4 > height) {
+                    height = width * 3 / 4;
+                } else {
+                    width = height * 4 / 3;
+                }
+                var aspectRatio = height / width;
+                var camerax = (xRange.max + xRange.min) / 2;
+                var cameray = (yRange.max + yRange.min) / 2;
+                camera.left = -width / 2;
+                camera.right = width / 2;
+                camera.top = height / 2;
+                camera.bottom = -height / 2;
+                camera.updateProjectionMatrix();
+                camera.position.set(camerax, cameray, 1);
+                camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
+
                 requestAnimationFrame(render);
                 _this.renderer.render(_this.scene, camera);
             };
@@ -692,7 +714,12 @@ var squid;
 
         MapRenderer.prototype.drawVariable = function (variableName, depthIndex) {
             var _this = this;
-            this.DataManager.loadMOVE(variableName, depthIndex).then(function (data) {
+            this.DataManager.loadMOVE(variableName, depthIndex, {
+                lonFrom: MapRenderer.lonW,
+                lonTo: MapRenderer.lonE,
+                latFrom: MapRenderer.latS,
+                latTo: MapRenderer.latN
+            }).then(function (data) {
                 if (_this.mesh !== undefined) {
                     _this.scene.remove(_this.mesh);
                 }
@@ -707,7 +734,12 @@ var squid;
 
         MapRenderer.prototype.drawSI = function (SI) {
             var _this = this;
-            this.DataManager.loadMOVE(SI.variableName, SI.depthIndex).then(function (data) {
+            this.DataManager.loadMOVE(SI.variableName, SI.depthIndex, {
+                lonFrom: MapRenderer.lonW,
+                lonTo: MapRenderer.lonE,
+                latFrom: MapRenderer.latS,
+                latTo: MapRenderer.latN
+            }).then(function (data) {
                 if (_this.mesh !== undefined) {
                     _this.scene.remove(_this.mesh);
                 }
@@ -725,7 +757,12 @@ var squid;
         MapRenderer.prototype.drawHSI = function (SIs) {
             var _this = this;
             this.$q.all(SIs.map(function (SI) {
-                return _this.DataManager.loadMOVE(SI.variableName, SI.depthIndex);
+                return _this.DataManager.loadMOVE(SI.variableName, SI.depthIndex, {
+                    lonFrom: MapRenderer.lonW,
+                    lonTo: MapRenderer.lonE,
+                    latFrom: MapRenderer.latS,
+                    latTo: MapRenderer.latN
+                });
             })).then(function (planes) {
                 if (_this.mesh !== undefined) {
                     _this.scene.remove(_this.mesh);
@@ -836,6 +873,10 @@ var squid;
                 });
             }).get();
         };
+        MapRenderer.lonW = 180;
+        MapRenderer.lonE = 200;
+        MapRenderer.latS = 34;
+        MapRenderer.latN = 46;
         return MapRenderer;
     })();
     squid.MapRenderer = MapRenderer;
@@ -953,13 +994,13 @@ var squid;
             this.$scope = $scope;
             this.$state = $state;
             this.DataManager = DataManager;
-            this.predictionDate = new Date(2013, 6, 1);
+            this.predictionDate = new Date(2006, 1, 1);
             this.cpueFrom = new Date(1999, 0, 1);
             this.cpueTo = new Date(2013, 11, 31);
             this.latFrom = 34;
             this.latTo = 46;
-            this.lonFrom = 180;
-            this.lonTo = 200;
+            this.lonFrom = 140;
+            this.lonTo = 160;
             this.depthMax = 30;
             this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
             this.username = localStorage.getItem('username') || '';
@@ -1000,6 +1041,10 @@ var squid;
                     });
                     return obj;
                 });
+                squid.MapRenderer.lonW = _this.lonFrom;
+                squid.MapRenderer.lonE = _this.lonTo;
+                squid.MapRenderer.latS = _this.latFrom;
+                squid.MapRenderer.latN = _this.latTo;
                 _this.DataManager.CPUEPoints = data;
                 _this.DataManager.selectedDate = _this.predictionDate;
                 _this.DataManager.cpueDateFrom = _this.cpueFrom;
