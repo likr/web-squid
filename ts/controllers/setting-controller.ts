@@ -1,18 +1,19 @@
 /// <reference path="../typings/d3/d3.d.ts"/>
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="../data-manager.ts"/>
+/// <reference path="../views/map-view.ts"/>
 
 module squid {
 export class SettingController {
   static $inject = ['$scope', '$state', 'DataManager'];
   private opendapEndpoint: string;
-  private predictionDate = new Date(2013, 6, 1);
+  private predictionDate = new Date(2006, 1, 1);
   private cpueFrom = new Date(1999, 0, 1);
   private cpueTo = new Date(2013, 11, 31);
   private latFrom = 34;
   private latTo = 46;
-  private lonFrom = 180;
-  private lonTo = 200;
+  private lonFrom = 140;
+  private lonTo = 160;
   private depthMax = 30;
   private username: string;
   private password: string;
@@ -57,6 +58,10 @@ export class SettingController {
         });
         return obj;
       });
+      MapRenderer.lonW = this.lonFrom;
+      MapRenderer.lonE = this.lonTo;
+      MapRenderer.latS = this.latFrom;
+      MapRenderer.latN = this.latTo;
       this.DataManager.CPUEPoints = data;
       this.DataManager.selectedDate = this.predictionDate;
       this.DataManager.cpueDateFrom = this.cpueFrom;

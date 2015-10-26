@@ -95,46 +95,47 @@ export class MapRenderer {
   private grid;
   private particles;
   private coastLine;
-  private xStart : number;
-  private xStop : number;
-  private yStart : number;
-  private yStop : number;
   private $q : ng.IQService;
   private DataManager : DataManager;
+  public static lonW = 180;
+  public static lonE = 200;
+  public static latS = 34;
+  public static latN = 46;
 
   constructor() {
-    var lonW = 180;
-    var lonE = 200;
-    var latS = 34;
-    var latN = 46;
-    var xRange = {
-      min: lonToX(lonW),
-      max: lonToX(lonE),
-    };
-    var yRange = {
-      min: latToY(latS),
-      max: latToY(latN),
-    };
-    var width = xRange.max - xRange.min;
-    var height = yRange.max - yRange.min;
-    var aspectRatio = height / width;
-
-    // initialize renderer
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setClearColor(<any>0xffffff, 1.0);
-
-    // initialize camera
-    var camerax = (xRange.max + xRange.min)/2,
-        cameray = (yRange.max + yRange.min)/2;
-    var camera = new THREE.OrthographicCamera(width/-2, width/2, height/2, height/-2, 1, 2);
-    camera.position.set(camerax, cameray, 1);
-    camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
-
-    // initialize scene
     this.scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-10, 10, 6, -6, 1, 2);
 
     // render
     var render = () => {
+      var xRange = {
+        min: lonToX(MapRenderer.lonW),
+        max: lonToX(MapRenderer.lonE),
+      };
+      var yRange = {
+        min: latToY(MapRenderer.latS),
+        max: latToY(MapRenderer.latN),
+      };
+      var width = xRange.max - xRange.min;
+      var height = yRange.max - yRange.min;
+      if (width * 3 / 4 > height) {
+        height = width * 3 / 4;
+      } else {
+        width = height * 4 / 3;
+      }
+      var aspectRatio = height / width;
+      var camerax = (xRange.max + xRange.min)/2;
+      var cameray = (yRange.max + yRange.min)/2;
+      camera.left = -width / 2;
+      camera.right = width / 2;
+      camera.top = height / 2;
+      camera.bottom = -height / 2;
+      camera.updateProjectionMatrix();
+      camera.position.set(camerax, cameray, 1);
+      camera.lookAt(new THREE.Vector3(camerax, cameray, 0));
+
       requestAnimationFrame(render);
       this.renderer.render(this.scene, camera);
     };
@@ -152,7 +153,12 @@ export class MapRenderer {
 
   drawVariable(variableName : string, depthIndex : number) {
     this.DataManager
-      .loadMOVE(variableName, depthIndex)
+      .loadMOVE(variableName, depthIndex, {
+        lonFrom: MapRenderer.lonW,
+        lonTo: MapRenderer.lonE,
+        latFrom: MapRenderer.latS,
+        latTo: MapRenderer.latN,
+      })
       .then(data => {
         if (this.mesh !== undefined) {
           this.scene.remove(this.mesh);
@@ -168,7 +174,12 @@ export class MapRenderer {
 
   drawSI(SI : SI) {
     this.DataManager
-      .loadMOVE(SI.variableName, SI.depthIndex)
+      .loadMOVE(SI.variableName, SI.depthIndex, {
+        lonFrom: MapRenderer.lonW,
+        lonTo: MapRenderer.lonE,
+        latFrom: MapRenderer.latS,
+        latTo: MapRenderer.latN,
+      })
       .then(data => {
         if (this.mesh !== undefined) {
           this.scene.remove(this.mesh);
@@ -185,7 +196,12 @@ export class MapRenderer {
   drawHSI(SIs) {
     this.$q
       .all(SIs.map(SI => {
-        return this.DataManager.loadMOVE(SI.variableName, SI.depthIndex);
+        return this.DataManager.loadMOVE(SI.variableName, SI.depthIndex, {
+        lonFrom: MapRenderer.lonW,
+        lonTo: MapRenderer.lonE,
+        latFrom: MapRenderer.latS,
+        latTo: MapRenderer.latN,
+      });
       }))
       .then(planes => {
         if (this.mesh !== undefined) {

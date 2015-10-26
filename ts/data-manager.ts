@@ -8,12 +8,6 @@ export class DataManager {
   public cpueDateFrom : Date;
   public cpueDateTo : Date;
   public opendapEndpoint : string;
-  public latStart = 192;
-  public latStop = 312;
-  public latLength = this.latStop - this.latStart;
-  public lonStart = 551;
-  public lonStop = 671;
-  public lonLength = this.lonStop - this.lonStart;
   public CPUEPoints : any[];
   public username: string;
   public password: string;
@@ -24,7 +18,7 @@ export class DataManager {
   constructor(private $q) {
   }
 
-  loadMOVE(variableName : string, depthIndex : number) {
+  loadMOVE(variableName : string, depthIndex : number, region : any) {
     var deferred = this.$q.defer();
     var key = this.key(variableName, this.selectedDate, depthIndex);
     if (this.dataCache[key]) {
@@ -33,8 +27,10 @@ export class DataManager {
       var v = variableName.toLowerCase();
       var dateIndex = this.dateIndex(this.selectedDate);
       var d = depthIndex;
-      var lat = this.latStart + ':' + this.latStop;
-      var lon = this.lonStart + ':' + this.lonStop;
+      var latRegion = this.region('lat', region.latFrom, region.latTo);
+      var lonRegion = this.region('lon', region.lonFrom, region.lonTo);
+      var lat = latRegion[0] + ':' + latRegion[1];
+      var lon = lonRegion[0] + ':' + lonRegion[1];
       var query = v + '[' + dateIndex + '][' + d + '][' + lat + '][' + lon + ']';
       if (/fcst\d{4}/.test(this.opendapEndpoint)) {
         switch (v) {
@@ -82,8 +78,8 @@ export class DataManager {
     return this.loadData(this.opendapEndpoint + 'w.dods?lat,lon,lev,time')
       .then(data => {
         this.axes = {
-          lat: data[3],
-          lon: data[2],
+          lon: data[3],
+          lat: data[2],
           lev: data[1],
           time: data[0],
         };
@@ -114,6 +110,26 @@ export class DataManager {
         deferred.resolve(result);
       });
     return deferred.promise;
+  }
+
+  private region(name : string, min : number, max : number) : any {
+    var axis = this.axes[name];
+    var x0 = axis.length - 1;
+    for (var i = 0; i < axis.length; ++i) {
+      if (min < axis[i]) {
+        x0 = Math.max(0, i - 1);
+        break;
+      }
+    }
+    var x1 = 0;
+    for (var i = axis.length - 1; i > 0; --i) {
+      if (axis[i] < max) {
+        x1 = Math.min(axis.length - 1, i + 1);
+        break;
+      }
+    }
+
+    return [x0, x1];
   }
 
   private dateIndex(date : Date) : number {
