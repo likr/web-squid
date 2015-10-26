@@ -106,6 +106,7 @@ export class MapRenderer {
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setClearColor(<any>0xffffff, 1.0);
     this.scene = new THREE.Scene();
+    this.drawCoastLine();
     var camera = new THREE.OrthographicCamera(-10, 10, 6, -6, 1, 2);
 
     // render
