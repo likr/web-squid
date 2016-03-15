@@ -3,13 +3,23 @@
     <div class="form-group">
       <label class="col-xs-2 control-label">CPUE From</label>
       <div class="col-xs-10">
-        <input class="form-control" ng-model="settings.cpueFrom" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+        <p class="input-group">
+          <input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="settings.cpueFrom" is-open="cpueFromOpened" datepicker-options="datepickerOptions"/>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="cpueFromOpened = !cpueFromOpened"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+        </p>
       </div>
     </div>
     <div class="form-group">
       <label class="col-xs-2 control-label">CPUE To</label>
       <div class="col-xs-10">
-        <input class="form-control" ng-model="settings.cpueTo" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+        <p class="input-group">
+          <input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="settings.cpueTo" is-open="cpueToOpened" datepicker-options="datepickerOptions"/>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="cpueToOpened = !cpueToOpened"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+        </p>
       </div>
     </div>
     <div class="form-group">
@@ -22,18 +32,6 @@
       <label class="col-xs-2 control-label">OPeNDAP Endpoint URL</label>
       <div class="col-xs-10">
         <input class="form-control" ng-model="settings.opendapEndpoint"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-xs-2 control-label">OPeNDAP User Name</label>
-      <div class="col-xs-10">
-        <input class="form-control" ng-model="settings.username"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-xs-2 control-label">OPeNDAP Password</label>
-      <div class="col-xs-10">
-        <input type="password" class="form-control" ng-model="settings.password"/>
       </div>
     </div>
     <div class="form-group">
