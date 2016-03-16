@@ -42571,7 +42571,7 @@
 	    this.lonFrom = 140;
 	    this.lonTo = 160;
 	    this.depthMax = 30;
-	    this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
+	    this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/dods/secret/';
 
 	    this.$scope = $scope;
 	    this.$state = $state;
