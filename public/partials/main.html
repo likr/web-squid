@@ -3,7 +3,12 @@
     <div class="form-group">
       <label class="col-xs-2 control-label">Target Date</label>
       <div class="col-xs-10">
-        <input class="form-control" ng-model="DataManager.selectedDate" datepicker-popup="yyyy/MM/dd" show-button-bar="false"/>
+        <p class="input-group">
+          <input type="text" class="form-control" uib-datepicker-popup="yyyy/MM/dd" ng-model="DataManager.selectedDate" is-open="selectedDateOpened" datepicker-options="datepickerOptions"/>
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="selectedDateOpened = !selectedDateOpened"><i class="glyphicon glyphicon-calendar"></i></button>
+          </span>
+        </p>
       </div>
     </div>
   </form>
