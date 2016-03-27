@@ -42570,7 +42570,7 @@
 	    this.latTo = 46;
 	    this.lonFrom = 140;
 	    this.lonTo = 160;
-	    this.depthMax = 30;
+	    this.depthMax = 25;
 	    this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/dods/secret/';
 
 	    this.$scope = $scope;
@@ -42611,7 +42611,7 @@
 	          };
 	          ['S', 'T', 'U', 'V', 'W'].forEach(function (v) {
 	            var i;
-	            for (i = 0; i < 54; ++i) {
+	            for (i = 0; i < _this.depthMax; ++i) {
 	              var val = +d[v + ('0' + (i + 1)).slice(-2)];
 	              obj[v.toLowerCase() + i] = ignore(val);
 	            }
@@ -52247,7 +52247,7 @@
 	_angular2.default.module(modName, []).controller('SITabController', function ($scope, SIManager, CorrelationRenderer, DistributionRenderer, VariableMapRenderer, SIMapRenderer) {
 	  $scope.currentSI = SIManager.createSI('s', 0, 0.5);
 	  $scope.depthMin = 0;
-	  $scope.depthMax = 30;
+	  $scope.depthMax = 25;
 	  $scope.lambdaMin = 0.001;
 	  $scope.lambdaMax = 0.999;
 	  $scope.lambdaStep = 0.001;
@@ -52507,7 +52507,7 @@
 	var modName = 'squid-hsi.services.correlation-renderer';
 
 	var svgMargin = 20;
-	var maxDepth = 30;
+	var maxDepth = 25;
 
 	_angular2.default.module(modName, []).factory('CorrelationRenderer', function (DataManager) {
 	  return function () {
