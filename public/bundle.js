@@ -42611,7 +42611,7 @@
 	          };
 	          ['S', 'T', 'U', 'V', 'W'].forEach(function (v) {
 	            var i;
-	            for (i = 0; i < _this.depthMax; ++i) {
+	            for (i = 0; i <= _this.depthMax; ++i) {
 	              var val = +d[v + ('0' + (i + 1)).slice(-2)];
 	              obj[v.toLowerCase() + i] = ignore(val);
 	            }
