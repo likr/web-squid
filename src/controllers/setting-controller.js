@@ -12,8 +12,8 @@ angular.module(modName, []).controller('SettingController', class SettingControl
     this.latTo = 46;
     this.lonFrom = 140;
     this.lonTo = 160;
-    this.depthMax = 30;
-    this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://priusa.yes.jamstec.go.jp/opendap/';
+    this.depthMax = 25;
+    this.opendapEndpoint = localStorage.getItem('opendapEndpoint') || 'http://dias-tb2.tkl.iis.u-tokyo.ac.jp:10080/dods/secret/';
 
     this.$scope = $scope;
     this.$state = $state;
@@ -50,7 +50,7 @@ angular.module(modName, []).controller('SettingController', class SettingControl
         };
         ['S', 'T', 'U', 'V', 'W'].forEach(v => {
           var i;
-          for (i = 0; i < 54; ++i) {
+          for (i = 0; i < this.depthMax; ++i) {
             var val = +d[v + ('0' + (i + 1)).slice(-2)]
             obj[v.toLowerCase() + i] = ignore(val);
           }

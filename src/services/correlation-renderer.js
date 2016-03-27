@@ -5,7 +5,7 @@ import {interpolator, correlation} from './spline'
 const modName = 'squid-hsi.services.correlation-renderer';
 
 const svgMargin = 20;
-const maxDepth = 30;
+const maxDepth = 25;
 
 angular.module(modName, []).factory('CorrelationRenderer', (DataManager) => {
   return class CorrelationRenderer {
