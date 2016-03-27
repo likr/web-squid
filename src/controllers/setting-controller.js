@@ -5,7 +5,7 @@ const modName = 'squid-hsi.controllers.setting-controller';
 
 angular.module(modName, []).controller('SettingController', class SettingController {
   constructor($scope, $state, MapRenderer, DataManager) {
-    this.predictionDate = new Date(2006, 1, 1);
+    this.predictionDate = new Date(2006, 0, 10);
     this.cpueFrom = new Date(1999, 0, 1);
     this.cpueTo = new Date(2013, 11, 31);
     this.latFrom = 34;

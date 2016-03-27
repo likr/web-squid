@@ -42563,7 +42563,7 @@
 	  function SettingController($scope, $state, MapRenderer, DataManager) {
 	    _classCallCheck(this, SettingController);
 
-	    this.predictionDate = new Date(2006, 1, 1);
+	    this.predictionDate = new Date(2006, 0, 10);
 	    this.cpueFrom = new Date(1999, 0, 1);
 	    this.cpueTo = new Date(2013, 11, 31);
 	    this.latFrom = 34;
@@ -52251,8 +52251,10 @@
 	  $scope.lambdaMin = 0.001;
 	  $scope.lambdaMax = 0.999;
 	  $scope.lambdaStep = 0.001;
-	  $scope.variables = [{ value: 's', name: 'Salinity' }, { value: 't', name: 'Temperature' }, { value: 'u', name: 'Horizontal Velocity (Lon.)' }, { value: 'v', name: 'Horizontal Velocity (Lat.)' }, { value: 'w', name: 'Vertical Velocity' }, { value: 'hm', name: 'Sea Surface Height' }, { value: 'hmgrad', name: 'Sea Surface Height (grad)' }, { value: 'mld', name: 'MLD' }];
+	  $scope.variables = [{ value: 's', name: 'Salinity' }, { value: 't', name: 'Temperature' }, { value: 'u', name: 'Horizontal Velocity (Lon.)' }, { value: 'v', name: 'Horizontal Velocity (Lat.)' }, { value: 'w', name: 'Vertical Velocity' }, { value: 'hm', name: 'Sea Surface Height' }];
 
+	  // {value: 'hmgrad', name: 'Sea Surface Height (grad)'},
+	  // {value: 'mld', name: 'MLD'},
 	  $scope.saveSI = function () {
 	    SIManager.registerSI($scope.currentSI);
 	    $scope.currentSI = SIManager.createSI($scope.currentSI.variableName, $scope.currentSI.depthIndex, $scope.currentSI.lambda);
